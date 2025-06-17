@@ -7,10 +7,14 @@
 
 import UIKit
 import SnapKit
+import RxSwift
+import RxCocoa
+
+protocol OnBoardingViewModelDelegate {
+    var didTapNext: PublishSubject<Void> { get set }
+}
 
 class OnBoardingViewController: UIViewController {
-    var viewModel: OnBoardingViewModel?
-    
     let titleLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 34, weight: .bold)
@@ -31,29 +35,40 @@ class OnBoardingViewController: UIViewController {
     let backgroundImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
+        imageView.layer.masksToBounds = true
         return imageView
     }()
     
-    let nextButton: UIButton = {
-        var config = UIButton.Configuration.filled()
-        config.cornerStyle = .capsule
-        config.baseBackgroundColor = .appBlue
-        config.baseForegroundColor = .white
-        let button = UIButton(configuration: config)
-        return button
-    }()
+    let nextButton = PrimaryButton(color: .appBlue)
     
     let gradientView = GradientView()
+    let disposeBag = DisposeBag()
+    let viewModel: OnBoardingViewModelDelegate
+    
+    init(viewModel: OnBoardingViewModelDelegate) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func viewDidLoad() {
         setupUI()
+        setupConstraints()
+        bindViewModel()
     }
     
-    func configure(page: OnBoardingPageModel) {
-        titleLabel.text = page.title
-        descriptionLabel.text = page.description
-        backgroundImageView.image = UIImage(named: page.imageName)
+    func configure(title: String, description: String, imageName: String) {
+        titleLabel.text = title
+        descriptionLabel.text = description
+        backgroundImageView.image = UIImage(named: imageName)
         nextButton.setTitle("Next", for: .normal)
+    }
+    
+    func bindViewModel() {
+        nextButton.rx.tap.bind(to: viewModel.didTapNext).disposed(by: disposeBag)
     }
     
     func setupUI() {
@@ -63,8 +78,6 @@ class OnBoardingViewController: UIViewController {
         view.addSubview(titleLabel)
         view.addSubview(descriptionLabel)
         view.addSubview(nextButton)
-        
-        setupConstraints()
     }
     
     func setupConstraints() {

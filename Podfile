@@ -7,5 +7,7 @@ target 'AI-Generator' do
 
   # Pods for AI-Generator
   pod 'SnapKit'
+  pod 'RxSwift'
+  pod 'RxCocoa'
 
 end

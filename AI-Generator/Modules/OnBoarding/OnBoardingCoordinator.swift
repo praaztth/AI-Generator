@@ -1,0 +1,71 @@
+//
+//  OnBoardingCoordinator.swift
+//  AI-Generator
+//
+//  Created by катенька on 17.06.2025.
+//
+
+import UIKit
+import RxSwift
+import RxCocoa
+
+class OnBoardingCoordinator: CoordinatorProtocol {
+    var childCoordinators: [CoordinatorProtocol] = []
+    var navigationController: UINavigationController
+    let currentPageIndex = BehaviorRelay(value: 0)
+    let disposeBag = DisposeBag()
+    
+    let pages: [OnBoardingPageModel] = [
+        OnBoardingPageModel(title: "AI Power", description: "Unleash the power of imagination - turn moments into art with AI", imageName: "onboarding1"),
+        OnBoardingPageModel(title: "AI Tools", description: "Generate photos and videos by writing text promts or uploading media", imageName: "onboarding2"),
+        OnBoardingPageModel(title: "AI Templates", description: "Turn any photo into a social media hit with our library of vibrant video template", imageName: "onboarding3")
+    ]
+    
+    init(navigationController: UINavigationController) {
+        self.navigationController = navigationController
+    }
+    
+    func start() {
+        currentPageIndex.subscribe(onNext: { index in
+            let page = self.pages[index]
+            
+            let viewModel = OnBoardingViewModel()
+            viewModel.didTapNext.subscribe { _ in
+                self.goToNextPage()
+            }.disposed(by: self.disposeBag)
+            
+            let viewController = OnBoardingViewController(viewModel: viewModel)
+            viewController.configure(title: page.title, description: page.description, imageName: page.imageName)
+            
+            self.navigationController.viewControllers = [viewController]
+        }).disposed(by: disposeBag)
+    }
+    
+    func goToNextPage() {
+        if currentPageIndex.value <= pages.count - 2 {
+            currentPageIndex.accept(currentPageIndex.value + 1)
+        } else {
+            let viewModel = OnBoardingAlertViewModel()
+            viewModel.didTapNext.subscribe { _ in
+                self.goToRateAlert()
+            }.disposed(by: disposeBag)
+            
+            viewModel.didTapCancel.subscribe { _ in
+                self.goToPayWall()
+            }.disposed(by: disposeBag)
+            
+            let viewController = OnBoardingAlertViewController(viewModel: viewModel)
+            viewController.configure(title: "Do you like our app?", description: "Please rate our app so we can improve it for ypu and make it even cooler", imageName: "paywallBackground")
+            
+            self.navigationController.viewControllers = [viewController]
+        }
+    }
+    
+    func goToRateAlert() {
+        print("\(#function) is called")
+    }
+    
+    func goToPayWall() {
+        print("\(#function) is called")
+    }
+}
