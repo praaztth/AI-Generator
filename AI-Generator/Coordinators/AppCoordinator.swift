@@ -43,11 +43,5 @@ final class AppCoordinator: CoordinatorProtocol {
         let coordinator = OnBoardingCoordinator(navigationController: navigationController)
         coordinator.start()
         childCoordinators.append(coordinator)
-//        let page = pages[currentIndex]
-//        let viewModel = OnBoardingViewModel()
-//        let viewController = OnBoardingViewController()
-//        viewController.viewModel = viewModel
-//        viewController.configure(page: page)
-//        navigationController.viewControllers = [viewController]
     }
 }

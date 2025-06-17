@@ -8,6 +8,7 @@
 import UIKit
 import RxSwift
 import RxCocoa
+import StoreKit
 
 class OnBoardingCoordinator: CoordinatorProtocol {
     var childCoordinators: [CoordinatorProtocol] = []
@@ -62,7 +63,12 @@ class OnBoardingCoordinator: CoordinatorProtocol {
     }
     
     func goToRateAlert() {
-        print("\(#function) is called")
+        DispatchQueue.main.async {
+            guard let scene = UIApplication.shared.connectedScenes.first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene else {
+                return
+            }
+            AppStore.requestReview(in: scene)
+        }
     }
     
     func goToPayWall() {
