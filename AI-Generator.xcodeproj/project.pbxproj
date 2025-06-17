@@ -6,8 +6,15 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		8CB17CA60A7417DD4436F68B /* Pods_AI_Generator.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 88D672E4586654921C0FAEAB /* Pods_AI_Generator.framework */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		80472F0E2E0188410098B744 /* AI-Generator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "AI-Generator.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		88D672E4586654921C0FAEAB /* Pods_AI_Generator.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AI_Generator.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		8FEF35F43FCEAEA08179F0F4 /* Pods-AI-Generator.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AI-Generator.debug.xcconfig"; path = "Target Support Files/Pods-AI-Generator/Pods-AI-Generator.debug.xcconfig"; sourceTree = "<group>"; };
+		C6CC99EB085CB118BF7172E3 /* Pods-AI-Generator.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AI-Generator.release.xcconfig"; path = "Target Support Files/Pods-AI-Generator/Pods-AI-Generator.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -36,17 +43,29 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8CB17CA60A7417DD4436F68B /* Pods_AI_Generator.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		1373C87981A5FF0ABDC8849D /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				8FEF35F43FCEAEA08179F0F4 /* Pods-AI-Generator.debug.xcconfig */,
+				C6CC99EB085CB118BF7172E3 /* Pods-AI-Generator.release.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
 		80472F052E0188410098B744 = {
 			isa = PBXGroup;
 			children = (
 				80472F102E0188410098B744 /* AI-Generator */,
 				80472F0F2E0188410098B744 /* Products */,
+				1373C87981A5FF0ABDC8849D /* Pods */,
+				EE223570A89337F38B0A2F3F /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -58,6 +77,14 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		EE223570A89337F38B0A2F3F /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				88D672E4586654921C0FAEAB /* Pods_AI_Generator.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -65,9 +92,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 80472F212E0188420098B744 /* Build configuration list for PBXNativeTarget "AI-Generator" */;
 			buildPhases = (
+				EE9904443F950EA7DAF036D1 /* [CP] Check Pods Manifest.lock */,
 				80472F0A2E0188410098B744 /* Sources */,
 				80472F0B2E0188410098B744 /* Frameworks */,
 				80472F0C2E0188410098B744 /* Resources */,
+				389BDFA8FCC30C9FCD45D4D6 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -77,8 +106,6 @@
 				80472F102E0188410098B744 /* AI-Generator */,
 			);
 			name = "AI-Generator";
-			packageProductDependencies = (
-			);
 			productName = "AI-Generator";
 			productReference = 80472F0E2E0188410098B744 /* AI-Generator.app */;
 			productType = "com.apple.product-type.application";
@@ -127,6 +154,48 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		389BDFA8FCC30C9FCD45D4D6 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-AI-Generator/Pods-AI-Generator-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-AI-Generator/Pods-AI-Generator-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-AI-Generator/Pods-AI-Generator-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		EE9904443F950EA7DAF036D1 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-AI-Generator-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		80472F0A2E0188410098B744 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -140,16 +209,17 @@
 /* Begin XCBuildConfiguration section */
 		80472F222E0188420098B744 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8FEF35F43FCEAEA08179F0F4 /* Pods-AI-Generator.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "AI-Generator/Info.plist";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -167,16 +237,17 @@
 		};
 		80472F232E0188420098B744 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = C6CC99EB085CB118BF7172E3 /* Pods-AI-Generator.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "AI-Generator/Info.plist";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				LD_RUNPATH_SEARCH_PATHS = (
