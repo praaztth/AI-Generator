@@ -15,6 +15,8 @@ protocol PaywallViewControllerOutput {
 }
 
 class PaywallViewController: UIViewController {
+    // TODO: добавить градиент в границу выбранной option button и в subscribe кнопку
+    // TODO: добавить серые кнопки с макета под subscription кнопкой
     let backgroundImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill

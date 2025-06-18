@@ -6,10 +6,13 @@
 //
 
 import UIKit
+import RxSwift
 
 class PaywallCoordinator: CoordinatorProtocol {
     var childCoordinators: [CoordinatorProtocol] = []
     var navigationController: UINavigationController
+    var didFinish = PublishSubject<Void>()
+    let disposedBag = DisposeBag()
     
     init(navigationController: UINavigationController) {
         self.navigationController = navigationController
@@ -18,6 +21,10 @@ class PaywallCoordinator: CoordinatorProtocol {
     func start() {
         let viewModel = PaywallViewModel()
         let viewController = PaywallViewController(viewModel: viewModel)
-        navigationController.viewControllers = [viewController]
+        navigationController.pushViewController(viewController, animated: true)
+        
+        viewModel.didTapSubscribeButton.subscribe(onNext: {
+            self.navigationController.popViewController(animated: true)
+        }).disposed(by: disposedBag)
     }
 }

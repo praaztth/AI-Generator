@@ -14,7 +14,7 @@ class OnBoardingCoordinator: CoordinatorProtocol {
     var childCoordinators: [CoordinatorProtocol] = []
     var navigationController: UINavigationController
     let currentPageIndex = BehaviorRelay(value: 0)
-    let didFinish = PublishSubject<Void>()
+    var didFinish = PublishSubject<Void>()
     let disposeBag = DisposeBag()
     
     let pages: [OnBoardingPageModel] = [

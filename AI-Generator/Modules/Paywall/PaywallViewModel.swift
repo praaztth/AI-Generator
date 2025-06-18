@@ -15,6 +15,7 @@ enum SubscriptionPlan {
 
 class PaywallViewModel: PaywallViewControllerOutput {
     var selectedSubscriptionPlan: SubscriptionPlan = .monthly
+    var didTapSubscribeButton = PublishSubject<Void>()
     
     func didSelectedUpperButton() {
         selectedSubscriptionPlan = .monthly
@@ -27,6 +28,7 @@ class PaywallViewModel: PaywallViewControllerOutput {
     }
     
     func didTappedSubscribeButton() {
+        didTapSubscribeButton.onNext(())
         print("Subscribe button tapped")
     }
 }
