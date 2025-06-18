@@ -14,6 +14,7 @@ class OnBoardingCoordinator: CoordinatorProtocol {
     var childCoordinators: [CoordinatorProtocol] = []
     var navigationController: UINavigationController
     let currentPageIndex = BehaviorRelay(value: 0)
+    let didFinish = PublishSubject<Void>()
     let disposeBag = DisposeBag()
     
     let pages: [OnBoardingPageModel] = [
@@ -42,6 +43,10 @@ class OnBoardingCoordinator: CoordinatorProtocol {
         }).disposed(by: disposeBag)
     }
     
+    func finish() {
+        didFinish.onNext(())
+    }
+    
     func goToNextPage() {
         if currentPageIndex.value <= pages.count - 2 {
             currentPageIndex.accept(currentPageIndex.value + 1)
@@ -52,7 +57,7 @@ class OnBoardingCoordinator: CoordinatorProtocol {
             }.disposed(by: disposeBag)
             
             viewModel.didTapCancel.subscribe { _ in
-                self.goToPayWall()
+                self.finish()
             }.disposed(by: disposeBag)
             
             let viewController = OnBoardingAlertViewController(viewModel: viewModel)
@@ -68,10 +73,7 @@ class OnBoardingCoordinator: CoordinatorProtocol {
                 return
             }
             AppStore.requestReview(in: scene)
+            self.finish()
         }
-    }
-    
-    func goToPayWall() {
-        print("\(#function) is called")
     }
 }

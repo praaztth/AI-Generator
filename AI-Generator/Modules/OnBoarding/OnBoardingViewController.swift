@@ -100,9 +100,7 @@ class OnBoardingViewController: UIViewController {
         }
         
         backgroundImageView.snp.makeConstraints { make in
-            make.top.equalTo(view)
-            make.left.equalTo(view)
-            make.right.equalTo(view)
+            make.top.left.right.equalTo(view)
             make.bottom.equalTo(titleLabel)
         }
         
