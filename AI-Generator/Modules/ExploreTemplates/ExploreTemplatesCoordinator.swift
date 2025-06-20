@@ -19,7 +19,8 @@ class ExploreTemplatesCoordinator: CoordinatorProtocol {
     }
     
     func start() {
-        let viewModel = ExploreTemplatesViewModel()
+        let apiService = PixVerseAPIService()
+        let viewModel = ExploreTemplatesViewModel(apiService: apiService)
         let viewController = ExploreTemplatesViewController(viewModel: viewModel)
         navigationController.viewControllers = [viewController]
         viewModel.openPaywallEvent.subscribe(onNext: {

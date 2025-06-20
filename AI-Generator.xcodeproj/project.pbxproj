@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		80694A302E04D7A1004D83CF /* SwiftHelper in Frameworks */ = {isa = PBXBuildFile; productRef = 80694A2F2E04D7A1004D83CF /* SwiftHelper */; };
 		8CB17CA60A7417DD4436F68B /* Pods_AI_Generator.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 88D672E4586654921C0FAEAB /* Pods_AI_Generator.framework */; };
 /* End PBXBuildFile section */
 
@@ -43,6 +44,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				80694A302E04D7A1004D83CF /* SwiftHelper in Frameworks */,
 				8CB17CA60A7417DD4436F68B /* Pods_AI_Generator.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -134,6 +136,9 @@
 			);
 			mainGroup = 80472F052E0188410098B744;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				80694A2E2E04D7A1004D83CF /* XCRemoteSwiftPackageReference "SwiftHelper" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 80472F0F2E0188410098B744 /* Products */;
 			projectDirPath = "";
@@ -404,6 +409,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		80694A2E2E04D7A1004D83CF /* XCRemoteSwiftPackageReference "SwiftHelper" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Vladimir089/SwiftHelper.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.1.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		80694A2F2E04D7A1004D83CF /* SwiftHelper */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 80694A2E2E04D7A1004D83CF /* XCRemoteSwiftPackageReference "SwiftHelper" */;
+			productName = SwiftHelper;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 80472F062E0188410098B744 /* Project object */;
 }

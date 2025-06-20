@@ -6,8 +6,8 @@ target 'AI-Generator' do
   use_frameworks!
 
   # Pods for AI-Generator
-  pod 'SnapKit'
   pod 'RxSwift'
   pod 'RxCocoa'
-
+  pod 'RxDataSources', '~> 5.0'
+  
 end

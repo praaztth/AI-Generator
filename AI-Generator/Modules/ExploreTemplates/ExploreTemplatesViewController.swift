@@ -6,14 +6,19 @@
 //
 
 import UIKit
+import RxSwift
+import RxCocoa
+import RxDataSources
 
 protocol ExploreTemplatesViewControllerOutput {
+    var sectionsDriver: Driver<[SectionOfTemplates]> { get }
     func didTapOpenPaywall()
 }
 
 class ExploreTemplatesViewController: UIViewController {
-    let customView = UIView()
-    let viewModel: ExploreTemplatesViewControllerOutput
+    private let customView = ExploreTemplatesView()
+    private let viewModel: ExploreTemplatesViewControllerOutput
+    private let disposeBag = DisposeBag()
     
     init(viewModel: ExploreTemplatesViewControllerOutput) {
         self.viewModel = viewModel
@@ -33,6 +38,32 @@ class ExploreTemplatesViewController: UIViewController {
         super.viewDidLoad()
         
         configureNavBar()
+        bindViewModel()
+    }
+    
+    func bindViewModel() {
+        let dataSource = RxCollectionViewSectionedReloadDataSource<SectionOfTemplates> { dataSource, collectionView, indexPath, item in
+            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ExploreTemplatesCollectionCell.reuseIdentifier, for: indexPath) as? ExploreTemplatesCollectionCell else {
+                return UICollectionViewCell(frame: .zero)
+            }
+            
+            switch item {
+            case .template(let templateItem):
+                cell.configure(name: templateItem.name)
+            case .style(let styleItem):
+                cell.configure(name: styleItem.name)
+            }
+            
+            return cell
+        } configureSupplementaryView: { dataSource, collectionView, kind, indexPath in
+            guard let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: TemplatesHeaderView.reuseIdentifier, for: indexPath) as? TemplatesHeaderView else { return UICollectionReusableView(frame: .zero) }
+            header.configure(title: dataSource.sectionModels[indexPath.section].header)
+            return header
+        }
+        
+        viewModel.sectionsDriver
+            .drive(customView.collectionView.rx.items(dataSource: dataSource))
+            .disposed(by: disposeBag)
     }
     
     func configureNavBar() {

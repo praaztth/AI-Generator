@@ -40,6 +40,8 @@ final class AppCoordinator: CoordinatorProtocol {
     func start() {
         if !userDefaultsService.hasCompletedOnboarding {
             goToOnBoarding()
+        } else {
+            goToExploreTemplates()
         }
     }
     
@@ -49,17 +51,19 @@ final class AppCoordinator: CoordinatorProtocol {
         childCoordinators.append(coordinator)
         
         coordinator.didFinish.subscribe(onNext: {
-//            self.userDefaultsService.hasCompletedOnboarding = true
-            self.goToExploreTemplates()
+            self.userDefaultsService.hasCompletedOnboarding = true
+            self.goToExploreTemplates(shouldShowPaywall: true)
             self.childDidFinished(child: coordinator)
             
         }).disposed(by: disposeBag)
     }
     
-    func goToExploreTemplates() {
+    func goToExploreTemplates(shouldShowPaywall: Bool = false) {
         let coordinator = ExploreTemplatesCoordinator(navigationController: navigationController)
         coordinator.start()
-        coordinator.showPaywall()
+        if shouldShowPaywall {
+            coordinator.showPaywall()
+        }
         childCoordinators.append(coordinator)
     }
 }
