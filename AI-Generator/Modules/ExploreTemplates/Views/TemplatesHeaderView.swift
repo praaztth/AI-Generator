@@ -7,6 +7,7 @@
 
 import UIKit
 import SwiftHelper
+import RxDataSources
 
 class TemplatesHeaderView: UICollectionReusableView {
     static let reuseIdentifier = "TemplatesHeaderView"

@@ -22,12 +22,20 @@ class ExploreTemplatesViewModel: ExploreTemplatesViewControllerOutput {
     init(apiService: PixVerseAPIServiceProtocol) {
         self.apiService = apiService
         self.sectionsDriver = apiService.fetchTemplates()
-            .map {
+            .map { templateResponse in
                 var sections: [SectionOfTemplates] = []
-                let templateItems = $0.templates.map { TemplateItem.template($0) }
-                let styleItems = $0.styles.map { TemplateItem.style($0) }
-                sections.append(SectionOfTemplates(header: "Templates", items: templateItems))
-                sections.append(SectionOfTemplates(header: "Styles", items: styleItems))
+                let categories: [String] = templateResponse.templates.map { $0.category }.reduce(into: []) { result, element in
+                    if !result.contains(element) {
+                        result.append(element)
+                    }
+                }
+                
+                categories.forEach { category in
+                    let items = templateResponse.templates.filter { $0.category == category }
+                    let sectionItem = SectionOfTemplates(header: category, items: items)
+                    sections.append(sectionItem)
+                }
+                
                 return sections
             }
             .asDriver(onErrorJustReturn: [])

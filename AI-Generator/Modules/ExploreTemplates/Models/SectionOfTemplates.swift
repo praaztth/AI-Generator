@@ -7,20 +7,15 @@
 
 import RxDataSources
 
-enum TemplateItem {
-    case template(Template)
-    case style(Style)
-}
-
 struct SectionOfTemplates {
     var header: String
     var items: [Item]
 }
 
 extension SectionOfTemplates: SectionModelType {
-    typealias Item = TemplateItem
+    typealias Item = Template
     
-    init(original: SectionOfTemplates, items: [TemplateItem]) {
+    init(original: SectionOfTemplates, items: [Template]) {
         self = original
         self.items = items
     }

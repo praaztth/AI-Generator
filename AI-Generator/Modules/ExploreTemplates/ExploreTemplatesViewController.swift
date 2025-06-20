@@ -42,28 +42,20 @@ class ExploreTemplatesViewController: UIViewController {
     }
     
     func bindViewModel() {
-        let dataSource = RxCollectionViewSectionedReloadDataSource<SectionOfTemplates> { dataSource, collectionView, indexPath, item in
-            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ExploreTemplatesCollectionCell.reuseIdentifier, for: indexPath) as? ExploreTemplatesCollectionCell else {
-                return UICollectionViewCell(frame: .zero)
-            }
-            
-            switch item {
-            case .template(let templateItem):
-                cell.configure(name: templateItem.name)
-            case .style(let styleItem):
-                cell.configure(name: styleItem.name)
-            }
-            
-            return cell
-        } configureSupplementaryView: { dataSource, collectionView, kind, indexPath in
-            guard let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: TemplatesHeaderView.reuseIdentifier, for: indexPath) as? TemplatesHeaderView else { return UICollectionReusableView(frame: .zero) }
-            header.configure(title: dataSource.sectionModels[indexPath.section].header)
-            return header
-        }
+        let dataSource = configureDataSource()
         
         viewModel.sectionsDriver
             .drive(customView.collectionView.rx.items(dataSource: dataSource))
             .disposed(by: disposeBag)
+        
+        customView.collectionView.rx
+            .modelSelected(Template.self)
+            .subscribe(onNext: { item in
+                print(item.name)
+            })
+            .disposed(by: disposeBag)
+
+
     }
     
     func configureNavBar() {
@@ -84,5 +76,22 @@ class ExploreTemplatesViewController: UIViewController {
     
     @objc func openPaywallButtonTapped() {
         viewModel.didTapOpenPaywall()
+    }
+    
+    func configureDataSource() -> RxCollectionViewSectionedReloadDataSource<SectionOfTemplates> {
+        return RxCollectionViewSectionedReloadDataSource<SectionOfTemplates> { dataSource, collectionView, indexPath, item in
+            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ExploreTemplatesCollectionCell.reuseIdentifier, for: indexPath) as? ExploreTemplatesCollectionCell else {
+                return UICollectionViewCell(frame: .zero)
+            }
+            
+            cell.configure(name: item.name)
+            return cell
+            
+        } configureSupplementaryView: { dataSource, collectionView, kind, indexPath in
+            guard let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: TemplatesHeaderView.reuseIdentifier, for: indexPath) as? TemplatesHeaderView else { return UICollectionReusableView(frame: .zero) }
+            
+            header.configure(title: dataSource.sectionModels[indexPath.section].header)
+            return header
+        }
     }
 }
