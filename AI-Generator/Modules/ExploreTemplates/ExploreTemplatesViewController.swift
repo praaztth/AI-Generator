@@ -12,6 +12,7 @@ import RxDataSources
 
 protocol ExploreTemplatesViewControllerOutput {
     var sectionsDriver: Driver<[SectionOfTemplates]> { get }
+    func didTapTemplate(at index: Int)
     func didTapOpenPaywall()
 }
 
@@ -31,7 +32,7 @@ class ExploreTemplatesViewController: UIViewController {
     
     override func loadView() {
         super.loadView()
-        view = customView
+        self.view = customView
     }
     
     override func viewDidLoad() {
@@ -51,11 +52,9 @@ class ExploreTemplatesViewController: UIViewController {
         customView.collectionView.rx
             .modelSelected(Template.self)
             .subscribe(onNext: { item in
-                print(item.name)
+                self.viewModel.didTapTemplate(at: item.template_id)
             })
             .disposed(by: disposeBag)
-
-
     }
     
     func configureNavBar() {

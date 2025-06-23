@@ -24,7 +24,12 @@ class PaywallCoordinator: CoordinatorProtocol {
         navigationController.pushViewController(viewController, animated: true)
         
         viewModel.didTapSubscribeButton.subscribe(onNext: {
-            self.navigationController.popViewController(animated: true)
+            self.finish()
         }).disposed(by: disposedBag)
+    }
+    
+    func finish() {
+        navigationController.popViewController(animated: true)
+        didFinish.onNext(())
     }
 }

@@ -44,6 +44,7 @@ class OnBoardingCoordinator: CoordinatorProtocol {
     }
     
     func finish() {
+        self.navigationController.viewControllers = []
         didFinish.onNext(())
     }
     

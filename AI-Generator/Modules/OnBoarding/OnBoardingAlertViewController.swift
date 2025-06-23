@@ -9,7 +9,7 @@ import RxSwift
 import RxCocoa
 
 class OnBoardingAlertViewController: OnBoardingViewController {
-    let cancelButton = PrimaryButton(color: .appDarkGray)
+    let cancelButton = PrimaryButton(color: .appDarkGrey)
     
     override func configure(title: String, description: String, imageName: String) {
         super.configure(title: title, description: description, imageName: imageName)

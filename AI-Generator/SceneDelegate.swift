@@ -21,8 +21,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         window = UIWindow(windowScene: windowScene)
         
         let navigationController = UINavigationController()
-        let service = UserDefaultsService()
-        let appCoordinator = AppCoordinator(navigationController: navigationController, userDefaultsService: service)
+        let apiService = PixVerseAPIService()
+        let storageService = UserDefaultsService()
+        let appCoordinator = AppCoordinator(apiService: apiService, storageService: storageService, navigationController: navigationController)
         appCoordinator.start()
         
         window?.rootViewController = navigationController

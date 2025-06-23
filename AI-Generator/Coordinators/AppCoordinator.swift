@@ -5,6 +5,7 @@
 //  Created by катенька on 17.06.2025.
 //
 
+import Foundation
 import UIKit
 import RxSwift
 
@@ -15,6 +16,7 @@ protocol CoordinatorProtocol: AnyObject {
     func childDidFinished(child: CoordinatorProtocol)
     
     func start()
+    func finish()
 }
 
 extension CoordinatorProtocol {
@@ -28,22 +30,30 @@ extension CoordinatorProtocol {
 final class AppCoordinator: CoordinatorProtocol {
     var childCoordinators: [CoordinatorProtocol] = []
     var navigationController: UINavigationController
-    var userDefaultsService: UserDefaultsServiceProtocol
+    let apiService: PixVerseAPIServiceProtocol
+    var storageService: UserDefaultsServiceProtocol
+    
     var didFinish = PublishSubject<Void>()
     let disposeBag = DisposeBag()
     
-    init(navigationController: UINavigationController, userDefaultsService: UserDefaultsServiceProtocol) {
+    init(apiService: PixVerseAPIServiceProtocol, storageService: UserDefaultsServiceProtocol, navigationController: UINavigationController) {
+        self.apiService = apiService
+        self.storageService = storageService
         self.navigationController = navigationController
-        self.userDefaultsService = userDefaultsService
     }
     
     func start() {
-        if !userDefaultsService.hasCompletedOnboarding {
+        // TODO: change storageService.hasCompletedOnboarding
+        if !storageService.hasCompletedOnboarding {
             goToOnBoarding()
         } else {
             goToExploreTemplates()
         }
+        
+        checkPendingRequests()
     }
+    
+    func finish() {}
     
     func goToOnBoarding() {
         let coordinator = OnBoardingCoordinator(navigationController: navigationController)
@@ -51,7 +61,7 @@ final class AppCoordinator: CoordinatorProtocol {
         childCoordinators.append(coordinator)
         
         coordinator.didFinish.subscribe(onNext: {
-            self.userDefaultsService.hasCompletedOnboarding = true
+            self.storageService.hasCompletedOnboarding = true
             self.goToExploreTemplates(shouldShowPaywall: true)
             self.childDidFinished(child: coordinator)
             
@@ -59,11 +69,36 @@ final class AppCoordinator: CoordinatorProtocol {
     }
     
     func goToExploreTemplates(shouldShowPaywall: Bool = false) {
-        let coordinator = ExploreTemplatesCoordinator(navigationController: navigationController)
+        let coordinator = ExploreTemplatesCoordinator(apiService: apiService, storageService: storageService, navigationController: navigationController)
         coordinator.start()
         if shouldShowPaywall {
             coordinator.showPaywall()
         }
         childCoordinators.append(coordinator)
+    }
+    
+    // TODO: move to some layer
+    func checkPendingRequests() {
+        let requests = storageService.getAllRequests()
+        requests.map { $0.video_id }
+            .forEach { videoID in
+                Observable<Int>.interval(.seconds(5), scheduler: ConcurrentDispatchQueueScheduler(qos: .background))
+                    .flatMapLatest { _ in
+                        self.apiService.checkPendingRequest(requestID: String(describing: videoID))
+                            .catch { error in
+                                Observable.empty()
+                            }
+                    }
+                    .take(while: { generatedVideo in
+                        generatedVideo.status != "success"
+                    })
+                    .subscribe(onNext: { responce in
+                        print(responce.status)
+                    }, onCompleted: {
+                        print("\(#file): \(#function): on comleted, removing generation request")
+                        self.storageService.removeRequest(videoID: videoID)
+                    })
+                    .disposed(by: disposeBag)
+            }
     }
 }
