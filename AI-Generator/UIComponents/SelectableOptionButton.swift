@@ -99,7 +99,7 @@ class SelectableOptionButton: UIButton {
             innerCircle.backgroundColor = .appBlue
             layer.borderWidth = 1
         } else {
-            outerCircle.layer.borderColor = UIColor.appGray.cgColor
+            outerCircle.layer.borderColor = UIColor.appGrey.cgColor
             innerCircle.backgroundColor = .clear
             layer.borderWidth = 0
         }
