@@ -16,7 +16,7 @@ protocol PixVerseAPIServiceProtocol {
 
 enum PixVerseAPIError: Error {
     case requestFailed(Error)
-    case decodingError(Error)
+    case decodingError(String)
     case notFound
 }
 
@@ -34,34 +34,7 @@ class PixVerseAPIService: PixVerseAPIServiceProtocol {
             .appending(path: "get_templates")
             .appending(path: Constants.appID)
         
-        return Single<TemplateResponse>.create { single in
-            let task = URLSession.shared.dataTask(with: url) { data, response, error in
-                if let error = error {
-                    single(.failure(PixVerseAPIError.requestFailed(error)))
-                    print(PixVerseAPIError.requestFailed(error))
-                    return
-                }
-                
-                guard let data = data else {
-                    single(.failure(PixVerseAPIError.notFound))
-                    print(PixVerseAPIError.notFound)
-                    return
-                }
-                
-                do {
-                    let templateResponse = try JSONDecoder().decode(TemplateResponse.self, from: data)
-                    single(.success(templateResponse))
-                } catch {
-                    single(.failure(PixVerseAPIError.decodingError(error)))
-                    print(PixVerseAPIError.decodingError(error))
-                }
-            }
-            task.resume()
-            
-            return Disposables.create {
-                task.cancel()
-            }
-        }
+        return get(url: url, body: nil, contentType: nil)
     }
     
     func generateFromTemplate(templateID: String, imageData: Data, imageName: String) -> Single<GenerationRequest> {
@@ -74,39 +47,12 @@ class PixVerseAPIService: PixVerseAPIServiceProtocol {
                 URLQueryItem(name: "appId", value: Constants.appID),
                 URLQueryItem(name: "templateId", value: templateID)
             ])
-        print(templateID)
-        
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
         
         let boundary = "Boundary-\(UUID().uuidString)"
-        
-        request.setValue("application/json", forHTTPHeaderField: "accept")
-        request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
-        
         let body = createMultipartBody(imageData: imageData, imageName: imageName, boundary: boundary)
-        request.httpBody = body
+        let contentType = "multipart/form-data; boundary=\(boundary)"
         
-        return Single<GenerationRequest>.create { single in
-            let task = self.createDataTask(request: request) { result in
-                switch result {
-                case .success(let data):
-                    do {
-                        let generationRequest = try JSONDecoder().decode(GenerationRequest.self, from: data)
-                        single(.success(generationRequest))
-                    } catch {
-                        single(.failure(PixVerseAPIError.decodingError(error)))
-                    }
-                case .failure(let error):
-                    single(.failure(error))
-                }
-            }
-            task.resume()
-            
-            return Disposables.create {
-                task.cancel()
-            }
-        }
+        return post(url: url, body: body, contentType: contentType)
     }
     
     func generateFromPrompt(prompt: String) -> Single<GenerationRequest> {
@@ -120,30 +66,7 @@ class PixVerseAPIService: PixVerseAPIServiceProtocol {
                 URLQueryItem(name: "promptText", value: prompt)
             ])
         
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        
-        //TODO: move single.create to reparated method
-        return Single<GenerationRequest>.create { single in
-            let task = self.createDataTask(request: request) { result in
-                switch result {
-                case .success(let data):
-                    do {
-                        let generationRequest = try JSONDecoder().decode(GenerationRequest.self, from: data)
-                        single(.success(generationRequest))
-                    } catch {
-                        single(.failure(PixVerseAPIError.decodingError(error)))
-                    }
-                case .failure(let error):
-                    single(.failure(error))
-                }
-            }
-            task.resume()
-            
-            return Disposables.create {
-                task.cancel()
-            }
-        }
+        return post(url: url, body: nil, contentType: nil)
     }
     
     func generateFromImagePrompt(prompt: String, imageData: Data, imageName: String) -> Single<GenerationRequest> {
@@ -157,40 +80,12 @@ class PixVerseAPIService: PixVerseAPIServiceProtocol {
                 URLQueryItem(name: "promptText", value: prompt)
             ])
         
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        
         let boundary = "Boundary-\(UUID().uuidString)"
-        
-        request.setValue("application/json", forHTTPHeaderField: "accept")
-        request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
-        
         let body = createMultipartBody(imageData: imageData, imageName: imageName, boundary: boundary)
-        request.httpBody = body
-        
-        return Single<GenerationRequest>.create { single in
-            let task = self.createDataTask(request: request) { result in
-                switch result {
-                case .success(let data):
-                    do {
-                        let generationRequest = try JSONDecoder().decode(GenerationRequest.self, from: data)
-                        single(.success(generationRequest))
-                    } catch {
-                        single(.failure(PixVerseAPIError.decodingError(error)))
-                    }
-                case .failure(let error):
-                    single(.failure(error))
-                }
-            }
-            task.resume()
-            
-            return Disposables.create {
-                task.cancel()
-            }
-        }
+        let contentType = "multipart/form-data; boundary=\(boundary)"
+        return post(url: url, body: body, contentType: contentType)
     }
     
-    // TODO: one common method from this two
     func checkPendingRequest(requestID: String) -> Observable<GeneratedVideo> {
         var url = URL(string: Constants.baseURL)!
         url = url.appending(path: "api")
@@ -208,7 +103,13 @@ class PixVerseAPIService: PixVerseAPIServiceProtocol {
                         let generatedVideo = try JSONDecoder().decode(GeneratedVideo.self, from: data)
                         observer.onNext(generatedVideo)
                     } catch {
-                        observer.onError(PixVerseAPIError.decodingError(error))
+                        if let responce = try? JSONSerialization.jsonObject(with: data) as? String {
+                            observer.onError(PixVerseAPIError.decodingError(responce))
+                        } else {
+                            let responce = String(data: data, encoding: .utf8) ?? "Unknown error"
+                            observer.onError(PixVerseAPIError.decodingError(responce))
+                        }
+                        
                     }
                 case .failure(let error):
                     observer.onError(error)
@@ -263,7 +164,10 @@ class PixVerseAPIService: PixVerseAPIServiceProtocol {
                         let decoded = try JSONDecoder().decode(T.self, from: data)
                         single(.success(decoded))
                     } catch {
-                        single(.failure(PixVerseAPIError.decodingError(error)))
+                        let jsonResponse = try? JSONSerialization.jsonObject(with: data) as? String
+                        let utfResponse = String(data: data, encoding: .utf8)
+                        
+                        single(.failure(PixVerseAPIError.decodingError(jsonResponse ?? utfResponse ?? "Unknown error")))
                     }
                 case .failure(let error):
                     single(.failure(error))

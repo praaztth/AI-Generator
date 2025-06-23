@@ -95,16 +95,19 @@ class UseEffectViewModel: UseEffectViewModelProtocol {
                     }
                     .share()
             }
-            .filter { $0.status == "success" }
+            .filter { $0.status == "success" || $0.status == "error" }
             .take(1)
-            .bind { generatedVideo in
-                guard let url = URL(string: generatedVideo.video_url) else { return }
+            .subscribe(onNext: { generatedVideo in
+                guard let stringURL = generatedVideo.video_url,
+                      let url = URL(string: stringURL) else { return }
                 self._generationFinished.onNext(url)
                 self.storageService.saveGeneratedVideo(generatedVideo)
                 if let id = self.generationRequestID {
                     self.storageService.removeRequest(videoID: id)
                 }
-            }
+            }, onError: { error in
+                print(error)
+            })
             .disposed(by: self.disposeBag)
     }
     
@@ -138,8 +141,8 @@ class MockApiService: PixVerseAPIServiceProtocol {
                 let templateResponse = try JSONDecoder().decode(TemplateResponse.self, from: data!)
                 single(.success(templateResponse))
             } catch {
-                single(.failure(PixVerseAPIError.decodingError(error)))
-                print(PixVerseAPIError.decodingError(error))
+                single(.failure(PixVerseAPIError.decodingError("error")))
+                print(PixVerseAPIError.decodingError("error"))
             }
             
             return Disposables.create {}

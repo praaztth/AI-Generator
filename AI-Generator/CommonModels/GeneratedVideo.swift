@@ -9,7 +9,7 @@ import Foundation
 
 struct GeneratedVideo: Codable {
     var status: String
-    let video_url: String
+    let video_url: String?
     
     mutating func setStatus(_ status: String) {
         self.status = status
