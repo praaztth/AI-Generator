@@ -37,24 +37,24 @@ final class UseEffectsCoordinator: CoordinatorProtocol {
         let viewController = UseEffectViewController(viewModel: viewModel!)
         navigationController.pushViewController(viewController, animated: true)
         
-        viewModel?.showLoading
-            .drive { [weak self] _ in
-//                self?.navigationController.popViewController(animated: false)
-//                self?.didStartGenerationVideo.accept(())
-                self?.goToLoadingView()
-            }
-            .disposed(by: disposeBag)
+//        viewModel?.showLoading
+//            .drive { [weak self] _ in
+////                self?.navigationController.popViewController(animated: false)
+////                self?.didStartGenerationVideo.accept(())
+//                self?.goToLoadingView()
+//            }
+//            .disposed(by: disposeBag)
         
-        viewModel?.generationFinished
-            .drive { [weak self] url in
-//                guard let url = URL(string: url) else { return }
-//                self?.didCompleteGenerationVideo.onNext(url)
-                guard let self = self else { return }
-                if self.shouldOpenResultView {
-                    self.goToResultView(videoURL: url)
-                }
-            }
-            .disposed(by: disposeBag)
+//        viewModel?.generationFinished
+//            .drive { [weak self] url in
+////                guard let url = URL(string: url) else { return }
+////                self?.didCompleteGenerationVideo.onNext(url)
+//                guard let self = self else { return }
+//                if self.shouldOpenResultView {
+//                    self.goToResultView(videoURL: url)
+//                }
+//            }
+//            .disposed(by: disposeBag)
         
         viewModel?.didCloseView
             .subscribe(onNext: { value in

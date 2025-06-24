@@ -10,13 +10,16 @@ import RxSwift
 import RxCocoa
 
 protocol UsePromptViewModelInputs {
-    
+    var clearInputDataDriver: Driver<Void> { get }
 }
 
 protocol UsePromptViewModelOutputs {
     var didTappedOpenPaywall: PublishRelay<Void> { get }
+//    var didTapInputField: PublishRelay<Void> { get }
     var didTapCreate: PublishRelay<Void> { get }
     var promptToGenerate: PublishRelay<String?> { get }
+    func setImageName(name: String)
+    func setImageData(image: UIImage)
 }
 
 protocol UsePromptViewModelToView {
@@ -27,7 +30,6 @@ protocol UsePromptViewModelToView {
 protocol UsePromptViewModelToCoordinator {
     var shouldOpenPaywall: Observable<Void> { get }
     var shouldGenerateVideo: Driver<GenerateBy> { get }
-//    var generationFinished: Driver<URL> { get }
 }
 
 class UsePromptViewModel: ViewModelConfigurable, UsePromptViewModelInputs, UsePromptViewModelOutputs, UsePromptViewModelToView, UsePromptViewModelToCoordinator {
@@ -41,10 +43,17 @@ class UsePromptViewModel: ViewModelConfigurable, UsePromptViewModelInputs, UsePr
     var input: UsePromptViewModelInputs { self }
     var output: UsePromptViewModelOutputs { self }
     
+    // ViewController inputs
+    private let _clearInputData = PublishRelay<Void>()
+    var clearInputDataDriver: Driver<Void> {
+        _clearInputData.asDriver(onErrorJustReturn: ())
+    }
+    
     // ViewController outputs
-    let didTappedOpenPaywall = PublishRelay<Void>()
+    var didTappedOpenPaywall = PublishRelay<Void>()
+//    var didTapInputField = PublishRelay<Void>()
     var didTapCreate = PublishRelay<Void>()
-    let promptToGenerate = PublishRelay<String?>()
+    var promptToGenerate = PublishRelay<String?>()
     
     // Coordinator inputs
     private let _shouldOpenPaywall = PublishRelay<Void>()
@@ -90,40 +99,18 @@ class UsePromptViewModel: ViewModelConfigurable, UsePromptViewModelInputs, UsePr
                 } else {
                     self._shouldGenerateVideo.accept(.prompt(prompt: prompt))
                 }
+                
+                self._clearInputData.accept(())
             })
             .disposed(by: disposeBag)
-        
-        
-//        promptToGenerate
-//            .do(onNext: { _ in
-//                self._showLoading.accept(())
-//            })
-//            .flatMapLatest { prompt -> Observable<GenerationRequest> in
-//                self.apiService.generateFromPrompt(prompt: prompt)
-//                    .asObservable()
-//            }
-//            .flatMapLatest { generationRequest -> Observable<GeneratedVideo> in
-//                self.storageService.saveRequest(generationRequest)
-//                self.generationRequestID = generationRequest.video_id
-//                return Observable<Int>.interval(.seconds(5), scheduler: ConcurrentDispatchQueueScheduler(qos: .background))
-//                    .flatMapLatest { _ -> Observable<GeneratedVideo> in
-//                        self.apiService.checkPendingRequest(requestID: String(generationRequest.video_id))
-//                    }
-//                    .share()
-//            }
-//            .filter { $0.status == "success" || $0.status == "error" }
-//            .take(1)
-//            .subscribe(onNext: { generatedVideo in
-//                guard let stringURL = generatedVideo.video_url,
-//                      let url = URL(string: stringURL) else { return }
-//                self._generationFinished.onNext(url)
-//                self.storageService.saveGeneratedVideo(generatedVideo)
-//                if let id = self.generationRequestID {
-//                    self.storageService.removeRequest(videoID: id)
-//                }
-//            }, onError: { error in
-//                print(error)
-//            })
-//            .disposed(by: self.disposeBag)
+    }
+    
+    func setImageName(name: String) {
+        self.imageName = name
+    }
+    
+    func setImageData(image: UIImage) {
+        self.imageData = image.jpegData(compressionQuality: 0.5)
+        print("размер файла: \(imageData?.count ?? 0)")
     }
 }

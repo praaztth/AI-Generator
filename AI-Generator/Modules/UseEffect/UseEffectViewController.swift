@@ -73,6 +73,7 @@ class UseEffectViewController: UIViewController {
             .disposed(by: disposeBag)
     }
     
+    // TODO: reuse code
     func displayVideoPicker() {
         var configuration = PHPickerConfiguration(photoLibrary: .shared())
         let filter = PHPickerFilter.images
@@ -86,6 +87,7 @@ class UseEffectViewController: UIViewController {
     }
 }
 
+// TODO: move to view model
 extension UseEffectViewController: PHPickerViewControllerDelegate {
     func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
         picker.dismiss(animated: true)
@@ -103,39 +105,5 @@ extension UseEffectViewController: PHPickerViewControllerDelegate {
                 print(error)
             }
             .disposed(by: disposeBag)
-
-        
-        // TODO: move to viewModel
-//        guard let itemProvider = results.first?.itemProvider,
-//              itemProvider.canLoadObject(ofClass: UIImage.self) else {
-//            return
-//        }
-//        
-//        if itemProvider.hasItemConformingToTypeIdentifier(UTType.image.identifier) {
-//            _ = itemProvider.loadFileRepresentation(for: .image) { [weak self] url, openInPlace, error in
-//                guard error == nil, let url = url else {
-//                    print("Ошибка загрузки: \(error?.localizedDescription ?? "Неизвестная ошибка")")
-//                    return
-//                }
-//                
-//                let fileName = url.lastPathComponent
-//                print("Имя файла: \(fileName)")
-//                DispatchQueue.main.async {
-//                    self?.viewModel.setImageName(name: fileName)
-//                }
-//            }
-//        }
-//        
-//        itemProvider.loadObject(ofClass: UIImage.self) { [weak self] image, error in
-//            guard let image = image as? UIImage,
-//                  error == nil else {
-//                return
-//            }
-//            
-//            DispatchQueue.main.async {
-//                self?.viewModel.setImageData(image: image)
-//                self?.customView.setSelectedImage(image: image)
-//            }
-//        }
     }
 }

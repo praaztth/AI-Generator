@@ -46,23 +46,6 @@ class UsePromptCoordinator: CoordinatorProtocol {
             }
             .disposed(by: disposeBag)
         
-//        viewModelInput.showLoading
-//            .drive { [weak self] _ in
-//                self?.goToLoadingView()
-//            }
-//            .disposed(by: disposeBag)
-        
-//        viewModelInput.generationFinished
-//            .drive { [weak self] url in
-//                guard let url = URL(string: url) else { return }
-//                self?.didCompleteGenerationVideo.onNext(url)
-//                guard let self = self else { return }
-//                if self.shouldOpenResultView {
-//                    self.goToResultView(videoURL: url)
-//                }
-//            }
-//            .disposed(by: disposeBag)
-        
     }
     
     func goToVideoGeneration(generateBy: GenerateBy) {
@@ -74,11 +57,6 @@ class UsePromptCoordinator: CoordinatorProtocol {
             self.childDidFinished(child: coordinator)
         }).disposed(by: disposeBag)
     }
-    
-//    func goToLoadingView() {
-//        let viewController = VideoGenerationProcessViewController(viewModel: viewModel!)
-//        navigationController.pushViewController(viewController, animated: true)
-//    }
     
     func finish() {
         

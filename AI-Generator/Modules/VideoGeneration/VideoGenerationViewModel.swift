@@ -40,10 +40,10 @@ class VideoGenerationViewModel: ViewModelConfigurable, VideoGenerationViewModelI
     }
     
     init(apiService: PixVerseAPIServiceProtocol, storageService: UserDefaultsServiceProtocol, generateBy: GenerateBy) {
-        self.apiService = apiService
-        self.storageService = storageService
-//        self.apiService = MockApiService()
-//        self.storageService = MockStorageService()
+//        self.apiService = apiService
+//        self.storageService = storageService
+        self.apiService = MockApiService()
+        self.storageService = MockStorageService()
         
         switch generateBy {
         case .imageTemplate(let imageData, let imageName, let templateID):
@@ -183,7 +183,22 @@ class MockApiService: PixVerseAPIServiceProtocol {
     }
     
     func generateFromPromptAndImage(prompt: String, imageData: Data, imageName: String) -> Single<GenerationRequest> {
-        Observable.empty().asSingle()
+        return Single.create { single in
+            let videoID = Int.random(in: 100...999)
+            single(.success(GenerationRequest(video_id: videoID, detail: "success")))
+            let generatedVideo = GeneratedVideo(status: "generating", video_url: "")
+            self.generatedVideos[videoID] = generatedVideo
+            
+            Observable<Int>.timer(.seconds(10), scheduler: ConcurrentDispatchQueueScheduler(qos: .background))
+                .subscribe(onNext: { _ in
+                    let generatedVideo = GeneratedVideo(status: "success", video_url: "https://api-use-core.store/static/video/large/3c81864e2f164799a522873170e783d7.mp4")
+                    print("get request from server, video generated")
+                    self.generatedVideos[videoID] = generatedVideo
+                })
+                .disposed(by: self.disposeBag)
+            
+            return Disposables.create {}
+        }
     }
     
     func checkPendingRequest(requestID: String) -> RxSwift.Observable<GeneratedVideo> {

@@ -18,10 +18,6 @@ class VideoGenerationCoordinator: CoordinatorProtocol {
     private let apiService: PixVerseAPIServiceProtocol
     private let storageService: UserDefaultsServiceProtocol
     private let generateBy: GenerateBy
-//    private let imageData: Data?
-//    private let imageName: String?
-//    private let templateID: String?
-//    private let prompt: String?
     private let disposeBag = DisposeBag()
     
     var childCoordinators: [any CoordinatorProtocol] = []
@@ -33,19 +29,6 @@ class VideoGenerationCoordinator: CoordinatorProtocol {
         self.apiService = apiService
         self.storageService = storageService
         self.generateBy = generateBy
-        
-//        switch generateBy {
-//        case .imageTemplate(let imageData, let imageName, let templateID):
-//            self.imageData = imageData
-//            self.imageName = imageName
-//            self.templateID = templateID
-//            self.prompt = nil
-//        case .prompt(let imageData, let imageName, let prompt):
-//            self.imageData = imageData
-//            self.imageName = imageName
-//            self.templateID = nil
-//            self.prompt = prompt
-//        }
     }
     
     func start() {

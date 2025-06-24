@@ -33,22 +33,24 @@ class UseEffectView: UIView {
         return view
     }()
     
-    let inputFieldButton: UIButton = {
-        var config = UIButton.Configuration.bordered()
-        config.image = UIImage(systemName: "photo.on.rectangle.angled")
-        config.imagePlacement = .all
-        config.title = "Create"
-        config.baseBackgroundColor = .appDark
-        config.baseForegroundColor = .appPaleGrey30
-        let button = UIButton(configuration: config)
-        button.contentMode = .scaleAspectFill
-        button.layer.cornerRadius = 32
-        button.layer.borderWidth = 1
-        button.layer.borderColor = UIColor.appPaleGrey30.cgColor
-        button.layer.masksToBounds = true
-        return button
-        
-    }()
+    let inputFieldButton = UIButton.createInputImageButton(emptyIcon: UIImage(systemName: "photo.on.rectangle.angled"), emptyText: "Upload Photo")
+    
+//    let inputFieldButton: UIButton = {
+//        var config = UIButton.Configuration.bordered()
+//        config.image = UIImage(systemName: "photo.on.rectangle.angled")
+//        config.imagePlacement = .all
+//        config.title = "Create"
+//        config.baseBackgroundColor = .appDark
+//        config.baseForegroundColor = .appPaleGrey30
+//        let button = UIButton(configuration: config)
+//        button.contentMode = .scaleAspectFill
+//        button.layer.cornerRadius = 32
+//        button.layer.borderWidth = 1
+//        button.layer.borderColor = UIColor.appPaleGrey30.cgColor
+//        button.layer.masksToBounds = true
+//        return button
+//        
+//    }()
     
     init() {
         super.init(frame: .zero)
@@ -120,10 +122,11 @@ class UseEffectView: UIView {
     }
     
     func setSelectedImage(image: UIImage) {
-        let imageSize = inputFieldButton.bounds.size
-        inputFieldButton.titleLabel?.isHidden = true
-        inputFieldButton.setImage(image.resize(targetSize: imageSize), for: .normal)
-        inputFieldButton.layer.borderWidth = 0
+        inputFieldButton.setSelectedInputImage(image)
+//        let imageSize = inputFieldButton.bounds.size
+//        inputFieldButton.titleLabel?.isHidden = true
+//        inputFieldButton.setImage(image.resize(targetSize: imageSize), for: .normal)
+//        inputFieldButton.layer.borderWidth = 0
     }
     
     func setVideoStateDidChagedCallback(callback: @escaping (VideoPlayerView.State) -> Void) {
