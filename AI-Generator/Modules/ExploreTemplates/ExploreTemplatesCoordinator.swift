@@ -7,19 +7,25 @@
 
 import UIKit
 import RxSwift
+import RxCocoa
 
 final class ExploreTemplatesCoordinator: CoordinatorProtocol {
     var childCoordinators: [CoordinatorProtocol] = []
-    var navigationController: UINavigationController
+    var navigationController = UINavigationController()
     let apiService: PixVerseAPIServiceProtocol
     let storageService: UserDefaultsServiceProtocol
     var didFinish = PublishSubject<Void>()
     let disposeBag = DisposeBag()
     
-    init(apiService: PixVerseAPIServiceProtocol, storageService: UserDefaultsServiceProtocol, navigationController: UINavigationController) {
+    private let _openPaywallEvent = PublishRelay<Void>()
+    var openPaywallEvent: Driver<Void> {
+        _openPaywallEvent.asDriver(onErrorJustReturn: ())
+    }
+    
+    
+    init(apiService: PixVerseAPIServiceProtocol, storageService: UserDefaultsServiceProtocol) {
         self.apiService = apiService
         self.storageService = storageService
-        self.navigationController = navigationController
     }
     
     func start() {
@@ -31,12 +37,14 @@ final class ExploreTemplatesCoordinator: CoordinatorProtocol {
             self.goToTemplate(id: templateId)
         }).disposed(by: disposeBag)
         
-        viewModel.openPaywallEvent.subscribe(onNext: {
-            self.showPaywall()
-        }).disposed(by: disposeBag)
+        viewModel.openPaywallEvent
+            .bind(to: _openPaywallEvent)
+            .disposed(by: disposeBag)
     }
     
-    func finish() {}
+    func finish() {
+        
+    }
     
     func goToTemplate(id: Int) {
         let coordinator = UseEffectsCoordinator(effectID: id, apiService: apiService, storageService: storageService, navigationController: navigationController)
@@ -51,7 +59,7 @@ final class ExploreTemplatesCoordinator: CoordinatorProtocol {
     }
     
     func showPaywall() {
-        let coordinator = PaywallCoordinator(navigationController: navigationController)
+        let coordinator = PaywallCoordinator()
         coordinator.start()
         childCoordinators.append(coordinator)
         
@@ -60,10 +68,10 @@ final class ExploreTemplatesCoordinator: CoordinatorProtocol {
         }).disposed(by: disposeBag)
     }
     
-    func goToLoadingView() {
-        let viewController = VideoGenerationProcessViewController()
-        navigationController.pushViewController(viewController, animated: true)
-    }
+//    func goToLoadingView() {
+//        let viewController = VideoGenerationProcessViewController()
+//        navigationController.pushViewController(viewController, animated: true)
+//    }
     
     func goToResultView(videoURL: URL) {
         let coordinator = VideoResultCoordinator(videoURL: videoURL, navigationController: navigationController, storageService: storageService)

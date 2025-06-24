@@ -1,24 +1,25 @@
 //
-//  VideoGenerationProcessViewController.swift
+//  VideoGenerationViewController.swift
 //  AI-Generator
 //
-//  Created by катенька on 23.06.2025.
+//  Created by катенька on 24.06.2025.
 //
 
+import Foundation
 import UIKit
 
-class VideoGenerationProcessViewController: UIViewController {
+class VideoGenerationViewController: UIViewController, ViewControllerConfigurable {
     let activityView: UIActivityIndicatorView = {
         let activityView = UIActivityIndicatorView(style: .large)
         activityView.color = .white
         return activityView
     }()
     
-    let viewModel: UseEffectViewModelProtocol
+    private let viewModel: VideoGenerationViewModelToView
     
-    init(viewModel: UseEffectViewModelProtocol) {
+    init(viewModel: VideoGenerationViewModelToView) {
         self.viewModel = viewModel
-        super.init(nibName: nil, bundle: nil )
+        super.init(nibName: nil, bundle: nil)
     }
     
     required init?(coder: NSCoder) {
@@ -26,17 +27,23 @@ class VideoGenerationProcessViewController: UIViewController {
     }
     
     override func viewDidLoad() {
-        view.backgroundColor = .black
+        setupUI()
+        setupConstraints()
+        bindViewModel()
+    }
+    
+    func setupUI() {
         view.addSubview(activityView)
         activityView.startAnimating()
-        
+    }
+    
+    func setupConstraints() {
         activityView.snp.makeConstraints { make in
             make.center.equalToSuperview()
         }
     }
     
-    deinit {
-        viewModel.didCloseView.onNext(true)
-        print("\(#file) deinitialized")
+    func bindViewModel() {
+        
     }
 }

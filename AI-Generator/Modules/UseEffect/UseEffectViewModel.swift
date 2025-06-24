@@ -26,17 +26,17 @@ protocol UseEffectViewModelProtocol {
 class UseEffectViewModel: UseEffectViewModelProtocol {
     // TODO: make a video generation into a separate module
     private let effectID: String
+//    private var imageData = BehaviorRelay<Data?>(value: nil)
+//    private var imageName = BehaviorRelay<String?>(value: nil)
     private var imageData: Data? = nil
     private var imageName: String? = nil
+
     private var generationRequestID: Int? = nil
     private let disposeBag = DisposeBag()
     
     private let apiService: PixVerseAPIServiceProtocol
     private let storageService: UserDefaultsServiceProtocol
     private let cacheService: CacheServiceProtocol
-    
-    private let _showLoading = PublishRelay<Void>()
-    private let _generationFinished = PublishSubject<URL>()
     
     var selectedImage: Data?
     // TODO: remove view model logic from view, onNext only from here
@@ -45,14 +45,19 @@ class UseEffectViewModel: UseEffectViewModelProtocol {
     let didTapCreateButton = PublishRelay<Void>()
     let didCloseView = BehaviorSubject<Bool>(value: false)
     
+    private let _showLoading = PublishRelay<Void>()
     var showLoading: Driver<Void> {
         _showLoading.asDriver(onErrorJustReturn: ())
     }
+    
+    private let _generationFinished = PublishSubject<URL>()
     var generationFinished: Driver<URL> {
         _generationFinished.asDriver { _ in
             Driver.empty()
         }
     }
+    
+    private let _generateVideo = PublishRelay<(Data, String)>()
     
     lazy var objectLoadedDriver: Driver<UseEffectModel?> = {
         return loadTrigger.map { self.getTemplate() }
@@ -72,6 +77,12 @@ class UseEffectViewModel: UseEffectViewModelProtocol {
     
     // TODO: move checking timer logic to other layer
     func bind() {
+//        didTapCreateButton
+//            .withLatestFrom(Observable.combineLatest(
+//                imageData.compactMap { $0 },
+//                imageName.compactMap { $0 }
+//            ))
+        // remove
         didTapCreateButton
             .asObservable()
             .do(onNext: { _ in
@@ -123,6 +134,7 @@ class UseEffectViewModel: UseEffectViewModelProtocol {
     }
     
     func setImageData(image: UIImage) {
+        // TODO: show error when size of image > 1024 KB
         self.imageData = image.jpegData(compressionQuality: 0.5)
         print("размер файла: \(imageData?.count ?? 0)")
     }

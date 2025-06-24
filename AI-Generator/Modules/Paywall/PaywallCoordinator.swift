@@ -10,18 +10,14 @@ import RxSwift
 
 class PaywallCoordinator: CoordinatorProtocol {
     var childCoordinators: [CoordinatorProtocol] = []
-    var navigationController: UINavigationController
+    var viewController: UIViewController?
     var didFinish = PublishSubject<Void>()
     let disposedBag = DisposeBag()
     
-    init(navigationController: UINavigationController) {
-        self.navigationController = navigationController
-    }
-    
     func start() {
         let viewModel = PaywallViewModel()
-        let viewController = PaywallViewController(viewModel: viewModel)
-        navigationController.pushViewController(viewController, animated: true)
+        viewController = PaywallViewController(viewModel: viewModel)
+        viewController?.modalPresentationStyle = .fullScreen
         
         viewModel.didTapSubscribeButton.subscribe(onNext: {
             self.finish()
@@ -29,7 +25,6 @@ class PaywallCoordinator: CoordinatorProtocol {
     }
     
     func finish() {
-        navigationController.popViewController(animated: true)
         didFinish.onNext(())
     }
 }

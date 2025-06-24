@@ -11,6 +11,8 @@ import RxCocoa
 
 protocol VideoResultViewModelInputs {
     var didSaveTapped: PublishRelay<Void> { get }
+    var didCloseView: BehaviorSubject<Bool> { get }
+    
 }
 
 protocol VideoResultViewModelOutputs {
@@ -22,7 +24,7 @@ protocol VideoResultViewModelToView {
     var output: VideoResultViewModelOutputs { get }
 }
 
-class VideoResultViewModel: VideoResultViewModelInputs, VideoResultViewModelOutputs, VideoResultViewModelToView {
+class VideoResultViewModel: ViewModelConfigurable, VideoResultViewModelInputs, VideoResultViewModelOutputs, VideoResultViewModelToView {
     private let storageService: UserDefaultsServiceProtocol
     private let disposeBag = DisposeBag()
     
@@ -34,17 +36,20 @@ class VideoResultViewModel: VideoResultViewModelInputs, VideoResultViewModelOutp
         _videoURL.asDriver()
     }
     var didSaveTapped = PublishRelay<Void>()
+    var didCloseView = BehaviorSubject<Bool>(value: false)
     
     init(videoURL: URL, storageService: UserDefaultsServiceProtocol) {
         self._videoURL = BehaviorRelay(value: videoURL)
         self.storageService = storageService
         
+        setupBindings()
+    }
+    
+    func setupBindings() {
         didSaveTapped
             .subscribe(onNext: {
                 print("save button tapped")
             })
             .disposed(by: disposeBag)
     }
-    
-    
 }

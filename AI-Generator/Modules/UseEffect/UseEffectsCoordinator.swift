@@ -9,12 +9,14 @@ import UIKit
 import RxSwift
 import RxCocoa
 
+// TODO: separate to two different modules
 final class UseEffectsCoordinator: CoordinatorProtocol {
     var childCoordinators: [CoordinatorProtocol] = []
     var navigationController: UINavigationController
     private let effectID: Int
     private let apiService: PixVerseAPIServiceProtocol
     private let storageService: UserDefaultsServiceProtocol
+    private var viewModel: UseEffectViewModelProtocol?
     private let disposeBag = DisposeBag()
     
     private var shouldOpenResultView = true
@@ -31,11 +33,11 @@ final class UseEffectsCoordinator: CoordinatorProtocol {
     }
     
     func start() {
-        let viewModel = UseEffectViewModel(effectID: self.effectID, apiService: apiService, storageSevice: storageService, cacheService: CacheService.shared)
-        let viewController = UseEffectViewController(viewModel: viewModel)
+        viewModel = UseEffectViewModel(effectID: self.effectID, apiService: apiService, storageSevice: storageService, cacheService: CacheService.shared)
+        let viewController = UseEffectViewController(viewModel: viewModel!)
         navigationController.pushViewController(viewController, animated: true)
         
-        viewModel.showLoading
+        viewModel?.showLoading
             .drive { [weak self] _ in
 //                self?.navigationController.popViewController(animated: false)
 //                self?.didStartGenerationVideo.accept(())
@@ -43,7 +45,7 @@ final class UseEffectsCoordinator: CoordinatorProtocol {
             }
             .disposed(by: disposeBag)
         
-        viewModel.generationFinished
+        viewModel?.generationFinished
             .drive { [weak self] url in
 //                guard let url = URL(string: url) else { return }
 //                self?.didCompleteGenerationVideo.onNext(url)
@@ -54,9 +56,12 @@ final class UseEffectsCoordinator: CoordinatorProtocol {
             }
             .disposed(by: disposeBag)
         
-        viewModel.didCloseView
+        viewModel?.didCloseView
             .subscribe(onNext: { value in
                 self.shouldOpenResultView = !value
+                if value {
+                    self.navigationController.popToRootViewController(animated: false)
+                }
             })
             .disposed(by: disposeBag)
     }
@@ -66,17 +71,17 @@ final class UseEffectsCoordinator: CoordinatorProtocol {
     }
     
     func goToLoadingView() {
-        let viewController = VideoGenerationProcessViewController()
-        var newViewControllers = navigationController.viewControllers
-        newViewControllers.removeLast()
-        newViewControllers.append(viewController)
-        navigationController.setViewControllers(newViewControllers, animated: false)
+        let viewController = VideoGenerationProcessViewController(viewModel: viewModel!)
+//        var newViewControllers = navigationController.viewControllers
+//        newViewControllers.removeLast()
+//        newViewControllers.append(viewController)
+//        navigationController.setViewControllers(newViewControllers, animated: false)
 //        navigationController.popViewController(animated: false)
-//        navigationController.pushViewController(viewController, animated: true)
+        navigationController.pushViewController(viewController, animated: true)
     }
     
     func goToResultView(videoURL: URL) {
-        navigationController.popViewController(animated: false)
+//        navigationController.popViewController(animated: false)
         
         let coordinator = VideoResultCoordinator(videoURL: videoURL, navigationController: navigationController, storageService: storageService)
         coordinator.start()

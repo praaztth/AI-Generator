@@ -11,6 +11,7 @@ import RxSwift
 class VideoResultCoordinator: CoordinatorProtocol {
     private let videoURL: URL
     private let storageService: UserDefaultsServiceProtocol
+    private let disposeBag = DisposeBag()
     
     var childCoordinators: [any CoordinatorProtocol] = []
     var navigationController: UINavigationController
@@ -26,10 +27,18 @@ class VideoResultCoordinator: CoordinatorProtocol {
         let viewModel = VideoResultViewModel(videoURL: videoURL, storageService: storageService)
         let viewController = VideoResultViewController(viewModel: viewModel)
         navigationController.pushViewController(viewController, animated: false)
+        
+        viewModel.didCloseView
+            .subscribe(onNext: { value in
+                if value {
+                    self.navigationController.popToRootViewController(animated: true)
+                }
+            })
+            .disposed(by: disposeBag)
     }
     
     func finish() {
-        navigationController.popViewController(animated: true)
+//        navigationController.popViewController(animated: true)
         didFinish.onNext(())
     }
 }

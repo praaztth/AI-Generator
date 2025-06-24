@@ -10,7 +10,7 @@ import RxSwift
 import GSPlayer
 import SwiftHelper
 
-class VideoResultViewController: UIViewController {
+class VideoResultViewController: UIViewController, ViewControllerConfigurable {
     private let viewModel: VideoResultViewModelToView
     private let disposeBag = DisposeBag()
     
@@ -27,18 +27,20 @@ class VideoResultViewController: UIViewController {
     init(viewModel: VideoResultViewModelToView) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
-        
-        setupUI()
-        setupConstraints()
-        
-        bindViewModel()
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override func viewDidLoad() {
+        setupUI()
+        setupConstraints()
+        bindViewModel()
+    }
+    
     func setupUI() {
+        view.backgroundColor = .black
         view.addSubview(playerView)
         view.addSubview(button)
     }
@@ -67,5 +69,9 @@ class VideoResultViewController: UIViewController {
                 self?.playerView.isMuted = true
             }
             .disposed(by: disposeBag)
+    }
+    
+    deinit {
+        viewModel.input.didCloseView.onNext(true)
     }
 }

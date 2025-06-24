@@ -12,7 +12,7 @@ import StoreKit
 
 class OnBoardingCoordinator: CoordinatorProtocol {
     var childCoordinators: [CoordinatorProtocol] = []
-    var navigationController: UINavigationController
+    var navigationController = UINavigationController()
     let currentPageIndex = BehaviorRelay(value: 0)
     var didFinish = PublishSubject<Void>()
     let disposeBag = DisposeBag()
@@ -22,10 +22,6 @@ class OnBoardingCoordinator: CoordinatorProtocol {
         OnBoardingPageModel(title: "AI Tools", description: "Generate photos and videos by writing text promts or uploading media", imageName: "onboarding2"),
         OnBoardingPageModel(title: "AI Templates", description: "Turn any photo into a social media hit with our library of vibrant video template", imageName: "onboarding3")
     ]
-    
-    init(navigationController: UINavigationController) {
-        self.navigationController = navigationController
-    }
     
     func start() {
         currentPageIndex.subscribe(onNext: { index in
@@ -44,7 +40,6 @@ class OnBoardingCoordinator: CoordinatorProtocol {
     }
     
     func finish() {
-        self.navigationController.viewControllers = []
         didFinish.onNext(())
     }
     

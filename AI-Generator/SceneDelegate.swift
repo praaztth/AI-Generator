@@ -20,14 +20,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         window = UIWindow(windowScene: windowScene)
         
-        let navigationController = UINavigationController()
         let apiService = PixVerseAPIService()
         let storageService = UserDefaultsService()
-        let appCoordinator = AppCoordinator(apiService: apiService, storageService: storageService, navigationController: navigationController)
+        let appCoordinator = AppCoordinator(apiService: apiService, storageService: storageService, window: window!)
         appCoordinator.start()
-        
-        window?.rootViewController = navigationController
-        window?.makeKeyAndVisible()
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {
