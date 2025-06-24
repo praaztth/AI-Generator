@@ -80,26 +80,25 @@ final class AppCoordinator: CoordinatorProtocol {
         }
     }
     
-    // TODO: move to some layer
     func checkPendingRequests() {
         let requests = storageService.getAllRequests()
         requests.map { $0.video_id }
             .forEach { videoID in
-                Observable<Int>.interval(.seconds(5), scheduler: ConcurrentDispatchQueueScheduler(qos: .background))
-                    .flatMapLatest { _ in
-                        self.apiService.checkPendingRequest(requestID: String(describing: videoID))
-                            .catch { error in
-                                Observable.empty()
-                            }
+                // TODO: move to separate nethod in GenerationFlowHelper
+                self.apiService.observeVideoGenerationStatus(videoID: String(videoID))
+                    .filter { videoID, generatedVideo in
+                        generatedVideo.status == "success" || generatedVideo.status == "error"
                     }
-                    .take(while: { generatedVideo in
-                        generatedVideo.status != "success"
-                    })
-                    .subscribe(onNext: { responce in
-                        print(responce.status)
+                    .take(1)
+                    .subscribe(onNext: { videoID, generatedVideo in
+                        if let id = Int(videoID) {
+                            self.storageService.removeRequest(videoID: id)
+                        }
+                        self.storageService.saveGeneratedVideo(generatedVideo)
+                    }, onError: { error in
+                        print(error)
                     }, onCompleted: {
                         print("\(#file): \(#function): on comleted, removing generation request")
-                        self.storageService.removeRequest(videoID: videoID)
                     })
                     .disposed(by: disposeBag)
             }

@@ -64,25 +64,34 @@ final class UseEffectsCoordinator: CoordinatorProtocol {
                 }
             })
             .disposed(by: disposeBag)
+        
+        viewModel?.shouldGenerateVideo
+            .drive { generateBy in
+                self.goToVideoGeneration(generateBy: generateBy)
+            }
+            .disposed(by: disposeBag)
     }
     
     func finish() {
         didFinish.onNext(())
     }
     
+    func goToVideoGeneration(generateBy: GenerateBy) {
+        let coordinator = VideoGenerationCoordinator(navigationController: navigationController, apiService: apiService, storageService: storageService, generateBy: generateBy)
+        coordinator.start()
+        childCoordinators.append(coordinator)
+        
+        coordinator.didFinish.subscribe(onNext: {
+            self.childDidFinished(child: coordinator)
+        }).disposed(by: disposeBag)
+    }
+    
     func goToLoadingView() {
         let viewController = VideoGenerationProcessViewController(viewModel: viewModel!)
-//        var newViewControllers = navigationController.viewControllers
-//        newViewControllers.removeLast()
-//        newViewControllers.append(viewController)
-//        navigationController.setViewControllers(newViewControllers, animated: false)
-//        navigationController.popViewController(animated: false)
         navigationController.pushViewController(viewController, animated: true)
     }
     
     func goToResultView(videoURL: URL) {
-//        navigationController.popViewController(animated: false)
-        
         let coordinator = VideoResultCoordinator(videoURL: videoURL, navigationController: navigationController, storageService: storageService)
         coordinator.start()
         childCoordinators.append(coordinator)

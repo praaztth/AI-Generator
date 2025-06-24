@@ -27,7 +27,7 @@ class TabBarCoordinator: CoordinatorProtocol {
         configureTabBarController()
         
         let templatesExploreCoordinator = ExploreTemplatesCoordinator(apiService: apiService, storageService: storageService)
-        let usePromptCoordinator = UsePromptCoordinator(apiService: apiService, storageService: storageService, navigationController: UINavigationController())
+        let usePromptCoordinator = UsePromptCoordinator(apiService: apiService, storageService: storageService)
         let profileCoordinator = ProfileCoordinator(apiService: apiService, storageService: storageService, navigationController: UINavigationController())
         
         templatesExploreCoordinator.start()
@@ -46,6 +46,12 @@ class TabBarCoordinator: CoordinatorProtocol {
         childCoordinators = [templatesExploreCoordinator, usePromptCoordinator, profileCoordinator]
         
         templatesExploreCoordinator.openPaywallEvent
+            .drive(onNext: {
+                self.showPayWall()
+            })
+            .disposed(by: disposeBag)
+        
+        usePromptCoordinator.shouldOpenPaywall
             .drive(onNext: {
                 self.showPayWall()
             })

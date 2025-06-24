@@ -33,6 +33,8 @@ class VideoGenerationViewController: UIViewController, ViewControllerConfigurabl
     }
     
     func setupUI() {
+        view.backgroundColor = .black
+        
         view.addSubview(activityView)
         activityView.startAnimating()
     }
@@ -45,5 +47,9 @@ class VideoGenerationViewController: UIViewController, ViewControllerConfigurabl
     
     func bindViewModel() {
         
+    }
+    
+    deinit {
+        viewModel.input.didCloseView.accept(())
     }
 }

@@ -11,7 +11,9 @@ protocol PixVerseAPIServiceProtocol {
     func fetchTemplates() -> Single<TemplateResponse>
     func generateFromTemplate(templateID: String, imageData: Data, imageName: String) -> Single<GenerationRequest>
     func generateFromPrompt(prompt: String) -> Single<GenerationRequest>
+    func generateFromPromptAndImage(prompt: String, imageData: Data, imageName: String) -> Single<GenerationRequest>
     func checkPendingRequest(requestID: String) -> Observable<GeneratedVideo>
+    func observeVideoGenerationStatus(videoID: String) -> Observable<(String, GeneratedVideo)>
 }
 
 enum PixVerseAPIError: Error {
@@ -69,7 +71,7 @@ class PixVerseAPIService: PixVerseAPIServiceProtocol {
         return post(url: url, body: nil, contentType: nil)
     }
     
-    func generateFromImagePrompt(prompt: String, imageData: Data, imageName: String) -> Single<GenerationRequest> {
+    func generateFromPromptAndImage(prompt: String, imageData: Data, imageName: String) -> Single<GenerationRequest> {
         var url = URL(string: Constants.baseURL)!
         url = url.appending(path: "api")
             .appending(path: "v1")
@@ -83,6 +85,7 @@ class PixVerseAPIService: PixVerseAPIServiceProtocol {
         let boundary = "Boundary-\(UUID().uuidString)"
         let body = createMultipartBody(imageData: imageData, imageName: imageName, boundary: boundary)
         let contentType = "multipart/form-data; boundary=\(boundary)"
+        
         return post(url: url, body: body, contentType: contentType)
     }
     
@@ -121,6 +124,15 @@ class PixVerseAPIService: PixVerseAPIServiceProtocol {
                 task.cancel()
             }
         }
+    }
+    
+    func observeVideoGenerationStatus(videoID: String) -> Observable<(String, GeneratedVideo)> {
+        return Observable<Int>.interval(.seconds(5), scheduler: ConcurrentDispatchQueueScheduler(qos: .background))
+            .flatMapLatest { _ -> Observable<(String, GeneratedVideo)> in
+                self.checkPendingRequest(requestID: videoID)
+                    .map { (videoID, $0) }
+            }
+            .share()
     }
     
     func createDataTask(request: URLRequest, completion: @escaping (Result<Data, PixVerseAPIError>) -> Void) -> URLSessionDataTask {

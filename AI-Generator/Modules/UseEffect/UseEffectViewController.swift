@@ -90,37 +90,52 @@ extension UseEffectViewController: PHPickerViewControllerDelegate {
     func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
         picker.dismiss(animated: true)
         
-        // TODO: move to viewModel
-        guard let itemProvider = results.first?.itemProvider,
-              itemProvider.canLoadObject(ofClass: UIImage.self) else {
-            return
-        }
+        guard let result = results.first else { return }
         
-        if itemProvider.hasItemConformingToTypeIdentifier(UTType.image.identifier) {
-            _ = itemProvider.loadFileRepresentation(for: .image) { [weak self] url, openInPlace, error in
-                guard error == nil, let url = url else {
-                    print("Ошибка загрузки: \(error?.localizedDescription ?? "Неизвестная ошибка")")
-                    return
-                }
-                
-                let fileName = url.lastPathComponent
-                print("Имя файла: \(fileName)")
-                DispatchQueue.main.async {
-                    self?.viewModel.setImageName(name: fileName)
-                }
-            }
-        }
-        
-        itemProvider.loadObject(ofClass: UIImage.self) { [weak self] image, error in
-            guard let image = image as? UIImage,
-                  error == nil else {
-                return
-            }
-            
-            DispatchQueue.main.async {
+        ImagePickerHelper.handlePickedResults(result: result)
+            .observe(on: MainScheduler.instance)
+            .subscribe { [weak self] image, imageName in
                 self?.viewModel.setImageData(image: image)
+                self?.viewModel.setImageName(name: imageName)
                 self?.customView.setSelectedImage(image: image)
+                
+            } onFailure: { error in
+                print(error)
             }
-        }
+            .disposed(by: disposeBag)
+
+        
+        // TODO: move to viewModel
+//        guard let itemProvider = results.first?.itemProvider,
+//              itemProvider.canLoadObject(ofClass: UIImage.self) else {
+//            return
+//        }
+//        
+//        if itemProvider.hasItemConformingToTypeIdentifier(UTType.image.identifier) {
+//            _ = itemProvider.loadFileRepresentation(for: .image) { [weak self] url, openInPlace, error in
+//                guard error == nil, let url = url else {
+//                    print("Ошибка загрузки: \(error?.localizedDescription ?? "Неизвестная ошибка")")
+//                    return
+//                }
+//                
+//                let fileName = url.lastPathComponent
+//                print("Имя файла: \(fileName)")
+//                DispatchQueue.main.async {
+//                    self?.viewModel.setImageName(name: fileName)
+//                }
+//            }
+//        }
+//        
+//        itemProvider.loadObject(ofClass: UIImage.self) { [weak self] image, error in
+//            guard let image = image as? UIImage,
+//                  error == nil else {
+//                return
+//            }
+//            
+//            DispatchQueue.main.async {
+//                self?.viewModel.setImageData(image: image)
+//                self?.customView.setSelectedImage(image: image)
+//            }
+//        }
     }
 }

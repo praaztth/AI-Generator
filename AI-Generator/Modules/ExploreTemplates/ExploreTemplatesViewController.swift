@@ -58,14 +58,15 @@ class ExploreTemplatesViewController: UIViewController {
     }
     
     func configureNavBar() {
-        let navBarAppearance = UINavigationBarAppearance()
-        navBarAppearance.configureWithOpaqueBackground()
-        navBarAppearance.backgroundColor = .black
-        navBarAppearance.titleTextAttributes = [.foregroundColor: UIColor.white]
-        navBarAppearance.largeTitleTextAttributes = [.foregroundColor: UIColor.white]
-        navigationController?.navigationBar.standardAppearance = navBarAppearance
-        navigationController?.navigationBar.prefersLargeTitles = true
-        navigationController?.navigationBar.tintColor = .white
+//        let navBarAppearance = UINavigationBarAppearance()
+//        navBarAppearance.configureWithOpaqueBackground()
+//        navBarAppearance.backgroundColor = .black
+//        navBarAppearance.titleTextAttributes = [.foregroundColor: UIColor.white]
+//        navBarAppearance.largeTitleTextAttributes = [.foregroundColor: UIColor.white]
+//        navigationController?.navigationBar.standardAppearance = navBarAppearance
+//        navigationController?.navigationBar.prefersLargeTitles = true
+//        navigationController?.navigationBar.tintColor = .white
+        navigationController?.configureNavigationBar()
         
         navigationItem.title = "Templates"
         let barButton = OpenPaywallBarButton()
