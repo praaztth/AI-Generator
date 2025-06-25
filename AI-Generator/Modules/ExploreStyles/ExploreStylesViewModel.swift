@@ -15,6 +15,7 @@ protocol ExploreStylesViewModelInputs {
 
 protocol ExploreStylesViewModelOutputs {
     var loadTrigger: PublishRelay<Void> { get }
+    var didSelectStyle: PublishRelay<Style> { get }
 }
 
 protocol ExploreStylesViewModelToView {
@@ -23,7 +24,7 @@ protocol ExploreStylesViewModelToView {
 }
 
 protocol ExploreStylesViewModelToCoordinator {
-    
+    var shouldOpenStyle: Driver<Style> { get }
 }
 
 class ExploreStylesViewModel: ViewModelConfigurable, ExploreStylesViewModelInputs, ExploreStylesViewModelOutputs, ExploreStylesViewModelToView, ExploreStylesViewModelToCoordinator {
@@ -44,8 +45,13 @@ class ExploreStylesViewModel: ViewModelConfigurable, ExploreStylesViewModelInput
     
     // ViewController Outputs
     var loadTrigger = PublishRelay<Void>()
+    var didSelectStyle = PublishRelay<Style>()
     
     // Coordinator Inputs
+    private let _shouldOpenStyle = PublishRelay<Style>()
+    var shouldOpenStyle: Driver<Style> {
+        _shouldOpenStyle.asDriver(onErrorJustReturn: Style.empty())
+    }
     
     init(apiService: PixVerseAPIServiceProtocol, storageService: UserDefaultsServiceProtocol, cacheService: CacheServiceProtocol) {
         self.apiService = apiService
@@ -56,10 +62,17 @@ class ExploreStylesViewModel: ViewModelConfigurable, ExploreStylesViewModelInput
     }
     
     func setupBindings() {
-        loadTrigger.subscribe(onNext: {
-            self.loadStyles()
-        })
-        .disposed(by: disposeBag)
+        loadTrigger
+            .subscribe(onNext: {
+                self.loadStyles()
+            })
+            .disposed(by: disposeBag)
+        
+        didSelectStyle
+            .subscribe(onNext: { selectedStyle in
+                self._shouldOpenStyle.accept(selectedStyle)
+            })
+            .disposed(by: disposeBag)
     }
     
     func loadStyles() {
@@ -79,17 +92,5 @@ class ExploreStylesViewModel: ViewModelConfigurable, ExploreStylesViewModelInput
                 print("\(#file): \(error)")
             }
             .disposed(by: disposeBag)
-
-        
-//        let generatedVideos = storageService.getAllGeneratedVideos()
-//
-//        let videoCellModels = generatedVideos
-//            .compactMap { video -> GeneratedVideoCellModel? in
-//                guard let stringUrl = video.video_url,
-//                      let url = URL(string: stringUrl) else { return nil }
-//                return GeneratedVideoCellModel(previewImage: UIImage(), videoURL: url)
-//            }
-//
-//        _sectionedVideos.accept([SectionOfVideos(items: videoCellModels)])
     }
 }

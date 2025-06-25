@@ -78,7 +78,7 @@ class UsePromptViewController: UIViewController, ViewControllerConfigurable {
         
         inputFieldButton.rx.tap
             .bind {
-                self.displayVideoPicker()
+                self.displayImagePicker()
             }
             .disposed(by: disposeBag)
         
@@ -91,7 +91,7 @@ class UsePromptViewController: UIViewController, ViewControllerConfigurable {
             .disposed(by: disposeBag)
     }
     
-    func displayVideoPicker() {
+    func displayImagePicker() {
         var configuration = PHPickerConfiguration(photoLibrary: .shared())
         let filter = PHPickerFilter.images
         configuration.filter = filter
@@ -150,12 +150,15 @@ extension UsePromptViewController: PHPickerViewControllerDelegate {
         
         guard let result = results.first else { return }
         
-        ImagePickerHelper.handlePickedResults(result: result)
+        GalleryPickerHelper.handlePickedResults(ofType: UIImage.self, typeIdentifiers: [UTType.image.identifier], result: result)
             .observe(on: MainScheduler.instance)
-            .subscribe { [weak self] image, imageName in
+            .subscribe { [weak self] image, url in
                 self?.viewModel.output.setImageData(image: image)
+                let imageName = url.lastPathComponent
                 self?.viewModel.output.setImageName(name: imageName)
-                self?.inputFieldButton.setSelectedInputImage(image)
+                DispatchQueue.main.async {
+                    self?.inputFieldButton.setSelectedInputImage(image)
+                }
                 
             } onFailure: { error in
                 print(error)

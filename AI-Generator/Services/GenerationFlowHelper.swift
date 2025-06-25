@@ -8,14 +8,7 @@
 import RxSwift
 
 final class GenerationFlowHelper {
-    static func createGenerationFlow(
-        imageData: Data?,
-        imageName: String?,
-        prompt: String?,
-        templateID: String?,
-        apiService: PixVerseAPIServiceProtocol,
-        storageService: UserDefaultsServiceProtocol,
-        generateClosure: @escaping () -> Observable<GenerationRequest>
+    static func createGenerationFlow(apiService: PixVerseAPIServiceProtocol, storageService: UserDefaultsServiceProtocol, generateClosure: @escaping () -> Observable<GenerationRequest>
     ) -> Observable<String> {
         let videoStatusObservable = generateClosure()
             .flatMapLatest { generationRequest -> Observable<(String, GeneratedVideo)> in

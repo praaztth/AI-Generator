@@ -94,12 +94,15 @@ extension UseEffectViewController: PHPickerViewControllerDelegate {
         
         guard let result = results.first else { return }
         
-        ImagePickerHelper.handlePickedResults(result: result)
+        GalleryPickerHelper.handlePickedResults(ofType: UIImage.self, typeIdentifiers: [UTType.image.identifier], result: result)
             .observe(on: MainScheduler.instance)
-            .subscribe { [weak self] image, imageName in
+            .subscribe { [weak self] image, url in
                 self?.viewModel.setImageData(image: image)
+                let imageName = url.lastPathComponent
                 self?.viewModel.setImageName(name: imageName)
-                self?.customView.setSelectedImage(image: image)
+                DispatchQueue.main.async {
+                    self?.customView.setSelectedImage(image: image)
+                }
                 
             } onFailure: { error in
                 print(error)

@@ -27,6 +27,25 @@ class ExploreStyleCoordinator: CoordinatorProtocol {
         let viewModel = ExploreStylesViewModel(apiService: apiService, storageService: storageService, cacheService: CacheService.shared)
         let viewController = ExploreStylesViewController(viewModel: viewModel)
         navigationController.viewControllers = [viewController]
+        
+        let viewModelOutput = viewModel as ExploreStylesViewModelToCoordinator
+        viewModelOutput.shouldOpenStyle
+            .drive(onNext: { style in
+                self.goToStyle(style: style)
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    func goToStyle(style: Style) {
+        let coordinator = UseStyleCoordinator(apiService: apiService, storageService: storageService, navigationController: navigationController, style: style)
+        coordinator.start()
+        childCoordinators.append(coordinator)
+        
+        coordinator.didFinish
+            .subscribe(onNext: {
+                self.childDidFinished(child: coordinator)
+            })
+            .disposed(by: disposeBag)
     }
     
     func finish() {

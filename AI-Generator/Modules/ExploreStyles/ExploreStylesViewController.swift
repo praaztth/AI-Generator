@@ -68,12 +68,10 @@ class ExploreStylesViewController: UIViewController {
             .drive(collectionView.rx.items(dataSource: dataSource))
             .disposed(by: disposeBag)
         
-//        customView.collectionView.rx
-//            .modelSelected(Template.self)
-//            .subscribe(onNext: { item in
-//                self.viewModel.didTapTemplate(at: item.template_id)
-//            })
-//            .disposed(by: disposeBag)
+        collectionView.rx
+            .modelSelected(Style.self)
+            .bind(to: viewModel.output.didSelectStyle)
+            .disposed(by: disposeBag)
     }
     
     func configureNavBar() {

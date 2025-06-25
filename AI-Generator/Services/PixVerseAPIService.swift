@@ -12,6 +12,7 @@ protocol PixVerseAPIServiceProtocol {
     func generateFromTemplate(templateID: String, imageData: Data, imageName: String) -> Single<GenerationRequest>
     func generateFromPrompt(prompt: String) -> Single<GenerationRequest>
     func generateFromPromptAndImage(prompt: String, imageData: Data, imageName: String) -> Single<GenerationRequest>
+    func generateFromStyle(templateID: String, videoData: Data, videoName: String) -> Single<GenerationRequest>
     func checkPendingRequest(requestID: String) -> Observable<GeneratedVideo>
     func observeVideoGenerationStatus(videoID: String) -> Observable<(String, GeneratedVideo)>
 }
@@ -51,7 +52,9 @@ class PixVerseAPIService: PixVerseAPIServiceProtocol {
             ])
         
         let boundary = "Boundary-\(UUID().uuidString)"
-        let body = createMultipartBody(imageData: imageData, imageName: imageName, boundary: boundary)
+        let typeName = "image"
+        let fileTypeName = "image/png"
+        let body = createMultipartBody(mediaData: imageData, mediaName: imageName, typeName: typeName, contentType: fileTypeName, boundary: boundary)
         let contentType = "multipart/form-data; boundary=\(boundary)"
         
         return post(url: url, body: body, contentType: contentType)
@@ -83,7 +86,29 @@ class PixVerseAPIService: PixVerseAPIServiceProtocol {
             ])
         
         let boundary = "Boundary-\(UUID().uuidString)"
-        let body = createMultipartBody(imageData: imageData, imageName: imageName, boundary: boundary)
+        let typeName = "image"
+        let fileTypeName = "image/png"
+        let body = createMultipartBody(mediaData: imageData, mediaName: imageName, typeName: typeName, contentType: fileTypeName, boundary: boundary)
+        let contentType = "multipart/form-data; boundary=\(boundary)"
+        
+        return post(url: url, body: body, contentType: contentType)
+    }
+    
+    func generateFromStyle(templateID: String, videoData: Data, videoName: String) -> Single<GenerationRequest> {
+        var url = URL(string: Constants.baseURL)!
+        url = url.appending(path: "api")
+            .appending(path: "v1")
+            .appending(path: "video2video")
+            .appending(queryItems: [
+                URLQueryItem(name: "userId", value: "test"),
+                URLQueryItem(name: "appId", value: Constants.appID),
+                URLQueryItem(name: "templateId", value: templateID)
+            ])
+        
+        let boundary = "Boundary-\(UUID().uuidString)"
+        let typeName = "video"
+        let fileTypeName = "video/mp4"
+        let body = createMultipartBody(mediaData: videoData, mediaName: videoName, typeName: typeName, contentType: fileTypeName, boundary: boundary)
         let contentType = "multipart/form-data; boundary=\(boundary)"
         
         return post(url: url, body: body, contentType: contentType)
@@ -105,12 +130,15 @@ class PixVerseAPIService: PixVerseAPIServiceProtocol {
                     do {
                         let generatedVideo = try JSONDecoder().decode(GeneratedVideo.self, from: data)
                         observer.onNext(generatedVideo)
+                        print("checkPendingRequest(requestID: String): \(generatedVideo)")
                     } catch {
                         if let responce = try? JSONSerialization.jsonObject(with: data) as? String {
                             observer.onError(PixVerseAPIError.decodingError(responce))
+                            print("checkPendingRequest(requestID: String): \(responce)")
                         } else {
                             let responce = String(data: data, encoding: .utf8) ?? "Unknown error"
                             observer.onError(PixVerseAPIError.decodingError(responce))
+                            print("checkPendingRequest(requestID: String): \(responce)")
                         }
                         
                     }
@@ -193,12 +221,12 @@ class PixVerseAPIService: PixVerseAPIServiceProtocol {
         }
     }
     
-    func createMultipartBody(imageData: Data, imageName: String, boundary: String) -> Data {
+    func createMultipartBody(mediaData: Data, mediaName: String, typeName: String, contentType: String, boundary: String) -> Data {
         var body = Data()
         body.append("--\(boundary)\r\n".data(using: .utf8)!)
-        body.append("Content-Disposition: form-data; name=\"image\"; filename=\"\(imageName)\"\r\n".data(using: .utf8)!)
-        body.append("Content-Type: image/png\r\n\r\n".data(using: .utf8)!)
-        body.append(imageData)
+        body.append("Content-Disposition: form-data; name=\"\(typeName)\"; filename=\"\(mediaName)\"\r\n".data(using: .utf8)!)
+        body.append("Content-Type: \(contentType)\r\n\r\n".data(using: .utf8)!)
+        body.append(mediaData)
         body.append("\r\n".data(using: .utf8)!)
         body.append("--\(boundary)--\r\n".data(using: .utf8)!)
         

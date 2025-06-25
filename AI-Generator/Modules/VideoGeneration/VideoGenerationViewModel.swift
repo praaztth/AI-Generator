@@ -47,81 +47,46 @@ class VideoGenerationViewModel: ViewModelConfigurable, VideoGenerationViewModelI
         
         switch generateBy {
         case .imageTemplate(let imageData, let imageName, let templateID):
-            GenerationFlowHelper.createGenerationFlow(
-                imageData: imageData,
-                imageName: imageName,
-                prompt: nil,
-                templateID: templateID,
-                apiService: self.apiService,
-                storageService: self.storageService
-            ) {
+            generateVideo() {
                 return self.apiService.generateFromTemplate(templateID: templateID, imageData: imageData, imageName: imageName)
                     .asObservable()
             }
-            .subscribe(onNext: { videoURL in
-                guard let url = URL(string: videoURL) else {
-                    self._generationFinished.onError(PixVerseAPIError.notFound)
-                    return
-                }
-                DispatchQueue.main.async {
-                    self._generationFinished.onNext(url)
-                }
-            }, onError: { error in
-                self._generationFinished.onError(error)
-                print("\(#file): Error while generating video:\(error)")
-            })
-            .disposed(by: disposeBag)
         case .promptAndImage(let imageData, let imageName, let prompt):
-            GenerationFlowHelper.createGenerationFlow(
-                imageData: imageData,
-                imageName: imageName,
-                prompt: prompt,
-                templateID: nil,
-                apiService: self.apiService,
-                storageService: self.storageService
-            ) {
+            generateVideo() {
                 return self.apiService.generateFromPromptAndImage(prompt: prompt, imageData: imageData, imageName: imageName)
                     .asObservable()
             }
-            .subscribe(onNext: { videoURL in
-                guard let url = URL(string: videoURL) else {
-                    self._generationFinished.onError(PixVerseAPIError.notFound)
-                    return
-                }
-                DispatchQueue.main.async {
-                    self._generationFinished.onNext(url)
-                }
-            }, onError: { error in
-                self._generationFinished.onError(error)
-                print("\(#file): Error while generating video:\(error)")
-            })
-            .disposed(by: disposeBag)
         case .prompt(let prompt):
-            GenerationFlowHelper.createGenerationFlow(
-                imageData: nil,
-                imageName: nil,
-                prompt: prompt,
-                templateID: nil,
-                apiService: self.apiService,
-                storageService: self.storageService
-            ) {
+            generateVideo() {
                 return self.apiService.generateFromPrompt(prompt: prompt)
                     .asObservable()
             }
-            .subscribe(onNext: { videoURL in
-                guard let url = URL(string: videoURL) else {
-                    self._generationFinished.onError(PixVerseAPIError.notFound)
-                    return
-                }
-                DispatchQueue.main.async {
-                    self._generationFinished.onNext(url)
-                }
-            }, onError: { error in
-                self._generationFinished.onError(error)
-                print("\(#file): Error while generating video:\(error)")
-            })
-            .disposed(by: disposeBag)
+        case .videoStyle(let videoData, let videoName, let templateID):
+            generateVideo {
+                return self.apiService.generateFromStyle(templateID: templateID, videoData: videoData, videoName: videoName)
+                    .asObservable()
+            }
         }
+    }
+    
+    func generateVideo(completion: @escaping () -> Observable<GenerationRequest>) {
+        GenerationFlowHelper.createGenerationFlow(apiService: self.apiService, storageService: self.storageService
+        ) {
+            completion()
+        }
+        .subscribe(onNext: { videoURL in
+            guard let url = URL(string: videoURL) else {
+                self._generationFinished.onError(PixVerseAPIError.notFound)
+                return
+            }
+            DispatchQueue.main.async {
+                self._generationFinished.onNext(url)
+            }
+        }, onError: { error in
+            self._generationFinished.onError(error)
+            print("\(#file): Error while generating video:\(error)")
+        })
+        .disposed(by: disposeBag)
     }
     
     func setupBindings() {
@@ -183,6 +148,25 @@ class MockApiService: PixVerseAPIServiceProtocol {
     }
     
     func generateFromPromptAndImage(prompt: String, imageData: Data, imageName: String) -> Single<GenerationRequest> {
+        return Single.create { single in
+            let videoID = Int.random(in: 100...999)
+            single(.success(GenerationRequest(video_id: videoID, detail: "success")))
+            let generatedVideo = GeneratedVideo(status: "generating", video_url: "")
+            self.generatedVideos[videoID] = generatedVideo
+            
+            Observable<Int>.timer(.seconds(10), scheduler: ConcurrentDispatchQueueScheduler(qos: .background))
+                .subscribe(onNext: { _ in
+                    let generatedVideo = GeneratedVideo(status: "success", video_url: "https://api-use-core.store/static/video/large/3c81864e2f164799a522873170e783d7.mp4")
+                    print("get request from server, video generated")
+                    self.generatedVideos[videoID] = generatedVideo
+                })
+                .disposed(by: self.disposeBag)
+            
+            return Disposables.create {}
+        }
+    }
+    
+    func generateFromStyle(templateID: String, videoData: Data, videoName: String) -> Single<GenerationRequest> {
         return Single.create { single in
             let videoID = Int.random(in: 100...999)
             single(.success(GenerationRequest(video_id: videoID, detail: "success")))

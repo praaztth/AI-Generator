@@ -11,4 +11,12 @@ struct UseEffectModel {
     let title: String
     let templateId: Int
     let videoURL: URL?
+    
+    static func empty() -> UseEffectModel {
+        return .init(
+            title: "",
+            templateId: 0,
+            videoURL: nil
+        )
+    }
 }

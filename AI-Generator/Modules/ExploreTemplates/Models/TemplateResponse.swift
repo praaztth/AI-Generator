@@ -33,4 +33,8 @@ struct Style: Codable {
     let preview_large: String
     let id: Int
     let template_id: Int
+    
+    static func empty() -> Style {
+        Style(prompt: "", name: "", is_active: false, preview_small: "", preview_large: "", id: 0, template_id: 0)
+    }
 }

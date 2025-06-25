@@ -17,17 +17,36 @@ class UseStyleCoordinator: CoordinatorProtocol {
     let apiService: PixVerseAPIServiceProtocol
     let storageService: UserDefaultsServiceProtocol
     var navigationController: UINavigationController
+    let style: Style
     
-    init(apiService: PixVerseAPIServiceProtocol, storageService: UserDefaultsServiceProtocol, navigationController: UINavigationController) {
+    init(apiService: PixVerseAPIServiceProtocol, storageService: UserDefaultsServiceProtocol, navigationController: UINavigationController, style: Style) {
         self.apiService = apiService
         self.storageService = storageService
         self.navigationController = navigationController
+        self.style = style
     }
     
     func start() {
-        let viewModel = ProfileViewModel(apiService: apiService, storageService: storageService)
-        let viewController = ProfileViewController(viewModel: viewModel)
-        navigationController.viewControllers = [viewController]
+        let viewModel = UseStyleViewModel(apiService: apiService, storageService: storageService, style: style)
+        let viewController = UseStyleViewController(viewModel: viewModel)
+        navigationController.pushViewController(viewController, animated: true)
+        
+        let viewModelInput = viewModel as UseStylesViewModelToCoordinator
+        viewModelInput.shouldGenerateVideo
+            .drive(onNext: { generateBy in
+                self.goToVideoGeneration(generateBy: generateBy)
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    func goToVideoGeneration(generateBy: GenerateBy) {
+        let coordinator = VideoGenerationCoordinator(navigationController: navigationController, apiService: apiService, storageService: storageService, generateBy: generateBy)
+        coordinator.start()
+        childCoordinators.append(coordinator)
+        
+        coordinator.didFinish.subscribe(onNext: {
+            self.childDidFinished(child: coordinator)
+        }).disposed(by: disposeBag)
     }
     
     func finish() {

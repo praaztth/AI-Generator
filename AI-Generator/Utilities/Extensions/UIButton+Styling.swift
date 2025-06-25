@@ -30,9 +30,10 @@ extension UIButton {
 extension UIButton {
     func setSelectedInputImage(_ image: UIImage?) {
         if let image = image {
-            let imageSize = self.bounds.size
             self.titleLabel?.isHidden = true
-            self.setImage(image.resize(targetSize: imageSize), for: .normal)
+//            let imageSize = self.bounds.size
+//            self.setImage(image.resize(targetSize: imageSize), for: .normal)
+            self.setImage(image, for: .normal)
             self.layer.borderWidth = 0
         }
     }

@@ -62,12 +62,6 @@ class UsePromptViewModel: ViewModelConfigurable, UsePromptViewModelInputs, UsePr
     var shouldGenerateVideo: Driver<GenerateBy> {
         _shouldGenerateVideo.asDriver(onErrorJustReturn: .prompt(prompt: ""))
     }
-    private let _generationFinished = PublishSubject<URL>()
-    var generationFinished: Driver<URL> {
-        _generationFinished.asDriver { _ in
-            Driver.empty()
-        }
-    }
     
     init(apiService: PixVerseAPIServiceProtocol, storageService: UserDefaultsServiceProtocol) {
         self.apiService = apiService

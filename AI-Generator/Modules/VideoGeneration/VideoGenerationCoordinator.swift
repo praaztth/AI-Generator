@@ -12,6 +12,7 @@ enum GenerateBy {
     case imageTemplate(imageData: Data, imageName: String, templateID: String)
     case prompt(prompt: String)
     case promptAndImage(imageData: Data, imageName: String, prompt: String)
+    case videoStyle(videoData: Data, videoName: String, templateID: String)
 }
 
 class VideoGenerationCoordinator: CoordinatorProtocol {

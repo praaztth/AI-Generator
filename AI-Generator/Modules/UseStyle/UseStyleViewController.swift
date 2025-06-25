@@ -5,11 +5,118 @@
 //  Created by катенька on 25.06.2025.
 //
 
-import Foundation
 import UIKit
+import GSPlayer
 import RxSwift
 import RxCocoa
+import GSPlayer
+import PhotosUI
 
-//class UseStyleViewController: UIViewController, ViewControllerConfigurable {
-//    
-//}
+class UseStyleViewController: UIViewController {
+    private let customView = UseEffectView()
+    private let viewModel: UseStylesViewModelToView
+    private let disposeBag = DisposeBag()
+    
+    init(viewModel: UseStylesViewModelToView) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func loadView() {
+        self.view = customView
+    }
+    
+    override func viewDidLoad() {
+        bindViewModel()
+        bindView()
+        loadData()
+    }
+    
+    func loadData() {
+        viewModel.output.loadData.accept(())
+    }
+    
+    func bindView() {
+        customView.setVideoStateDidChagedCallback { [weak self] state in
+            switch state {
+            case .loading:
+                self?.customView.startActivityIndicator()
+            case .playing:
+                self?.customView.stopActivityIndicator()
+            case .error:
+                self?.customView.showError()
+            default:
+                break
+            }
+        }
+        
+        customView.bindInputButton(to: viewModel.output.didTapInputField)
+        customView.bindCreateButton(to: viewModel.output.didTapCreateButton)
+    }
+    
+    func bindViewModel() {
+        viewModel.input.modelToDisplay
+            .drive(onNext: { [weak self] object in
+                self?.customView.configure(withObject: object)
+            })
+            .disposed(by: disposeBag)
+        
+        viewModel.output.didTapInputField
+            .subscribe(onNext: { [weak self] _ in
+                self?.displayVideoPicker()
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    // TODO: reuse code
+    func displayVideoPicker() {
+        var configuration = PHPickerConfiguration(photoLibrary: .shared())
+        let filter = PHPickerFilter.videos
+        configuration.filter = filter
+        configuration.preferredAssetRepresentationMode = .compatible
+        configuration.selectionLimit = 1
+        
+        let picker = PHPickerViewController(configuration: configuration)
+        picker.delegate = self
+        present(picker, animated: true)
+    }
+}
+
+// TODO: move to view model
+extension UseStyleViewController: PHPickerViewControllerDelegate {
+    func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
+        picker.dismiss(animated: true)
+        
+        guard let result = results.first else { return }
+        let itemProvider = result.itemProvider
+        
+        let videoTypes: [UTType] = [
+            .movie,
+            .video,
+            .mpeg4Movie,
+            .avi,
+            .quickTimeMovie,
+            .mpeg,
+            .mpeg2Video
+        ]
+        
+        let videoTypeIdentifiers = videoTypes.map { $0.identifier }
+        
+        itemProvider.rxLoadMediaFilePath(for: videoTypeIdentifiers)
+            .subscribe(onSuccess: { [weak self] url in
+                // TODO: generate preview
+                self?.viewModel.output.setVideoData(with: url)
+                DispatchQueue.main.async {
+                    self?.customView.setSelectedImage(image: UIImage())
+                }
+            }, onFailure: { error in
+                print(error)
+            })
+            .disposed(by: disposeBag)
+    }
+}
+

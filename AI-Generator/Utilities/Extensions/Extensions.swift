@@ -50,21 +50,21 @@ extension UINavigationController {
 }
 
 extension NSItemProvider {
-    func rxLoadImage() -> Single<UIImage> {
+    func rxLoadMediaFile<T: NSItemProviderReading>(ofType: T.Type) -> Single<T> {
         return Single.create { single in
-            guard self.canLoadObject(ofClass: UIImage.self) else {
-                single(.failure(NSError(domain: "RxLoadImageError: cannot load image", code: -1)))
+            guard self.canLoadObject(ofClass: T.self) else {
+                single(.failure(NSError(domain: "RxLoadMediaFileError: cannot load file", code: -1)))
                 return Disposables.create {}
             }
             
-            self.loadObject(ofClass: UIImage.self) { image, error in
+            self.loadObject(ofClass: T.self) { image, error in
                 if let error = error {
                     single(.failure(error))
                     return
                 }
                 
-                guard let image = image as? UIImage else {
-                    single(.failure(NSError(domain: "RxLoadImageError: failed while loading image", code: -1)))
+                guard let image = image as? T else {
+                    single(.failure(NSError(domain: "RxLoadMediaFileError: failed while loading file", code: -1)))
                     return
                 }
                 
@@ -75,26 +75,25 @@ extension NSItemProvider {
         }
     }
     
-    func rxLoadImageName() -> Single<String> {
+    func rxLoadMediaFilePath(for typeIdentifiers: [String]) -> Single<URL> {
         return Single.create { single in
-            guard self.hasItemConformingToTypeIdentifier(UTType.image.identifier) else {
-                single(.failure(NSError(domain: "RxLoadImageNameError: has not item conforming to UIImage identifier", code: -1)))
+            guard let identifier = typeIdentifiers.first(where: { self.hasItemConformingToTypeIdentifier($0) }) else {
+                single(.failure(NSError(domain: "RxLoadImageNameError: item doesn't conforming to passed type identifiers", code: -1)))
                 return Disposables.create()
             }
             
-            self.loadFileRepresentation(forTypeIdentifier: UTType.image.identifier) { url, error in
+            self.loadFileRepresentation(forTypeIdentifier: identifier) { url, error in
                 if let error = error {
                     single(.failure(error))
                     return
                 }
                 
                 guard let url = url else {
-                    single(.failure(NSError(domain: "RxLoadImageNameError", code: -1)))
+                    single(.failure(NSError(domain: "RxLoadMediaFileNameError", code: -1)))
                     return
                 }
                 
-                let fileName = url.lastPathComponent
-                single(.success(fileName))
+                single(.success(url))
             }
             
             return Disposables.create()
