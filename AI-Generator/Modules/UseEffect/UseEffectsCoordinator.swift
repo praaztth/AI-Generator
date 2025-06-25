@@ -21,8 +21,6 @@ final class UseEffectsCoordinator: CoordinatorProtocol {
     
     private var shouldOpenResultView = true
     
-//    let didStartGenerationVideo = PublishRelay<Void>()
-//    let didCompleteGenerationVideo = PublishSubject<URL>()
     var didFinish = PublishSubject<Void>()
     
     init(effectID: Int, apiService: PixVerseAPIServiceProtocol, storageService: UserDefaultsServiceProtocol, navigationController: UINavigationController) {
@@ -36,25 +34,6 @@ final class UseEffectsCoordinator: CoordinatorProtocol {
         viewModel = UseEffectViewModel(effectID: self.effectID, apiService: apiService, storageSevice: storageService, cacheService: CacheService.shared)
         let viewController = UseEffectViewController(viewModel: viewModel!)
         navigationController.pushViewController(viewController, animated: true)
-        
-//        viewModel?.showLoading
-//            .drive { [weak self] _ in
-////                self?.navigationController.popViewController(animated: false)
-////                self?.didStartGenerationVideo.accept(())
-//                self?.goToLoadingView()
-//            }
-//            .disposed(by: disposeBag)
-        
-//        viewModel?.generationFinished
-//            .drive { [weak self] url in
-////                guard let url = URL(string: url) else { return }
-////                self?.didCompleteGenerationVideo.onNext(url)
-//                guard let self = self else { return }
-//                if self.shouldOpenResultView {
-//                    self.goToResultView(videoURL: url)
-//                }
-//            }
-//            .disposed(by: disposeBag)
         
         viewModel?.didCloseView
             .subscribe(onNext: { value in
@@ -78,21 +57,6 @@ final class UseEffectsCoordinator: CoordinatorProtocol {
     
     func goToVideoGeneration(generateBy: GenerateBy) {
         let coordinator = VideoGenerationCoordinator(navigationController: navigationController, apiService: apiService, storageService: storageService, generateBy: generateBy)
-        coordinator.start()
-        childCoordinators.append(coordinator)
-        
-        coordinator.didFinish.subscribe(onNext: {
-            self.childDidFinished(child: coordinator)
-        }).disposed(by: disposeBag)
-    }
-    
-    func goToLoadingView() {
-        let viewController = VideoGenerationProcessViewController(viewModel: viewModel!)
-        navigationController.pushViewController(viewController, animated: true)
-    }
-    
-    func goToResultView(videoURL: URL) {
-        let coordinator = VideoResultCoordinator(videoURL: videoURL, navigationController: navigationController, storageService: storageService)
         coordinator.start()
         childCoordinators.append(coordinator)
         

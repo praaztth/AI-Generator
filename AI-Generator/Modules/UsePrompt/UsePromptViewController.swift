@@ -74,16 +74,12 @@ class UsePromptViewController: UIViewController, ViewControllerConfigurable {
     func bindViewModel() {
         createButton.rx.tap
             .bind(to: viewModel.output.didTapCreate)
-//            .subscribe(onNext: {
-//                self.viewModel.output.didTapCreate.accept(())
-//            })
             .disposed(by: disposeBag)
         
         inputFieldButton.rx.tap
             .bind {
                 self.displayVideoPicker()
             }
-//            .bind(to: viewModel.output.didTapInputField)
             .disposed(by: disposeBag)
         
         viewModel.input.clearInputDataDriver
@@ -111,7 +107,8 @@ class UsePromptViewController: UIViewController, ViewControllerConfigurable {
         navigationController?.configureNavigationBar()
         
         navigationItem.title = "Generation"
-        let barButton = OpenPaywallBarButton()
+        let imageBarButton = UIImage(systemName: "sparkles")
+        let barButton = BarButton(title: "PRO", backgroundColor: .appBlue, image: imageBarButton)
         barButton.addTarget(self, action: #selector(openPaywallButtonTapped), for: .touchUpInside)
         navigationItem.rightBarButtonItem = UIBarButtonItem(customView: barButton)
     }

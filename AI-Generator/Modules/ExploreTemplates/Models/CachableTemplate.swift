@@ -14,3 +14,11 @@ class CachableTemplate {
         self.data = data
     }
 }
+
+class CachableStyle {
+    let data: Style
+    
+    init(data: Style) {
+        self.data = data
+    }
+}

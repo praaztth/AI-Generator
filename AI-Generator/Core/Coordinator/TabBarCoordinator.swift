@@ -27,22 +27,26 @@ class TabBarCoordinator: CoordinatorProtocol {
         configureTabBarController()
         
         let templatesExploreCoordinator = ExploreTemplatesCoordinator(apiService: apiService, storageService: storageService)
+        let stylesExploreCoordinator = ExploreStyleCoordinator(apiService: apiService, storageService: storageService)
         let usePromptCoordinator = UsePromptCoordinator(apiService: apiService, storageService: storageService)
         let profileCoordinator = ProfileCoordinator(apiService: apiService, storageService: storageService, navigationController: UINavigationController())
         
         templatesExploreCoordinator.start()
+        stylesExploreCoordinator.start()
         usePromptCoordinator.start()
         profileCoordinator.start()
         
         let templatesExploreViewController = templatesExploreCoordinator.navigationController
+        let stylesExploreViewController = stylesExploreCoordinator.navigationController
         let usePromptViewController = usePromptCoordinator.navigationController
         let profileViewController = profileCoordinator.navigationController
         
-        templatesExploreViewController.tabBarItem = UITabBarItem(title: "AI Video", image: UIImage(systemName: "play.rectangle.on.rectangle.fill"), tag: 0)
-        usePromptViewController.tabBarItem = UITabBarItem(title: "Promt", image: UIImage(systemName: "sparkles"), tag: 1)
-        profileViewController.tabBarItem = UITabBarItem(title: "Profile", image: UIImage(systemName: "person.fill"), tag: 2)
+        templatesExploreViewController.tabBarItem = UITabBarItem(title: "Templates", image: UIImage(systemName: "play.rectangle.on.rectangle.fill"), tag: 0)
+        stylesExploreViewController.tabBarItem = UITabBarItem(title: "Styles", image: UIImage(systemName: "play.rectangle.on.rectangle.fill"), tag: 1)
+        usePromptViewController.tabBarItem = UITabBarItem(title: "AI Promt", image: UIImage(systemName: "sparkles"), tag: 2)
+        profileViewController.tabBarItem = UITabBarItem(title: "Profile", image: UIImage(systemName: "person.fill"), tag: 3)
         
-        tabBarController.viewControllers = [templatesExploreViewController, usePromptViewController, profileViewController]
+        tabBarController.viewControllers = [templatesExploreViewController, stylesExploreViewController, usePromptViewController, profileViewController]
         childCoordinators = [templatesExploreCoordinator, usePromptCoordinator, profileCoordinator]
         
         templatesExploreCoordinator.openPaywallEvent

@@ -11,7 +11,6 @@ import RxCocoa
 
 class UsePromptCoordinator: CoordinatorProtocol {
     private let disposeBag = DisposeBag()
-    private var viewModel: UsePromptViewModel?
     
     var childCoordinators = [CoordinatorProtocol]()
     var didFinish = PublishSubject<Void>()
@@ -31,11 +30,11 @@ class UsePromptCoordinator: CoordinatorProtocol {
     }
     
     func start() {
-        viewModel = UsePromptViewModel(apiService: apiService, storageService: storageService)
-        let viewController = UsePromptViewController(viewModel: viewModel!)
+        let viewModel = UsePromptViewModel(apiService: apiService, storageService: storageService)
+        let viewController = UsePromptViewController(viewModel: viewModel)
         navigationController.viewControllers = [viewController]
         
-        let viewModelInput = viewModel! as UsePromptViewModelToCoordinator
+        let viewModelInput = viewModel as UsePromptViewModelToCoordinator
         viewModelInput.shouldOpenPaywall
             .bind(to: _shouldOpenPaywall)
             .disposed(by: disposeBag)

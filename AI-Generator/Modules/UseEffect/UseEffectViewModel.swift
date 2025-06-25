@@ -17,8 +17,6 @@ protocol UseEffectViewModelProtocol {
     var objectLoadedDriver: Driver<UseEffectModel?> { get }
     
     var shouldGenerateVideo: Driver<GenerateBy> { get }
-//    var showLoading: Driver<Void> { get }
-//    var generationFinished: Driver<URL> { get }
     
     func setImageName(name: String)
     func setImageData(image: UIImage)
@@ -49,18 +47,6 @@ class UseEffectViewModel: UseEffectViewModelProtocol {
     var shouldGenerateVideo: Driver<GenerateBy> {
         _shouldGenerateVideo.asDriver(onErrorJustReturn: .prompt(prompt: ""))
     }
-    
-//    private let _showLoading = PublishRelay<Void>()
-//    var showLoading: Driver<Void> {
-//        _showLoading.asDriver(onErrorJustReturn: ())
-//    }
-    
-//    private let _generationFinished = PublishSubject<URL>()
-//    var generationFinished: Driver<URL> {
-//        _generationFinished.asDriver { _ in
-//            Driver.empty()
-//        }
-//    }
     
     lazy var objectLoadedDriver: Driver<UseEffectModel?> = {
         return loadTrigger.map { self.getTemplate() }

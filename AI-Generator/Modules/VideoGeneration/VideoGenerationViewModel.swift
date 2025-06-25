@@ -220,6 +220,10 @@ class MockStorageService: UserDefaultsServiceProtocol {
         []
     }
     
+    func getAllGeneratedVideos() -> [GeneratedVideo] {
+        []
+    }
+    
     func removeRequest(videoID: Int) {}
     
     func saveGeneratedVideo(_ generatedVideo: GeneratedVideo) {}

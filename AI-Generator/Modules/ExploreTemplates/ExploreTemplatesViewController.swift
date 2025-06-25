@@ -61,7 +61,8 @@ class ExploreTemplatesViewController: UIViewController {
         navigationController?.configureNavigationBar()
         
         navigationItem.title = "Templates"
-        let barButton = OpenPaywallBarButton()
+        let imageBarButton = UIImage(systemName: "sparkles")
+        let barButton = BarButton(title: "PRO", backgroundColor: .appBlue, image: imageBarButton)
         barButton.addTarget(self, action: #selector(openPaywallButtonTapped), for: .touchUpInside)
         navigationItem.rightBarButtonItem = UIBarButtonItem(customView: barButton)
     }

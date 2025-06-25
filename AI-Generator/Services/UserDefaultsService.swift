@@ -10,11 +10,12 @@ import Foundation
 protocol UserDefaultsServiceProtocol {
     var hasCompletedOnboarding: Bool { get set }
     func saveRequest(_ request: GenerationRequest)
+    func saveGeneratedVideo(_ generatedVideo: GeneratedVideo)
     func getRequest(videoID: Int) -> GenerationRequest?
     func getGeneratedVideo(url: String) -> GeneratedVideo?
     func getAllRequests() -> [GenerationRequest]
+    func getAllGeneratedVideos() -> [GeneratedVideo]
     func removeRequest(videoID: Int)
-    func saveGeneratedVideo(_ generatedVideo: GeneratedVideo)
     func removeGeneratedVideo(url: String)
 }
 
@@ -33,7 +34,13 @@ final class UserDefaultsService: UserDefaultsServiceProtocol {
         var requests = getAllObjects(ofType: GenerationRequest.self, for: generationRequests)
         requests.append(request)
         saveAllObjects(requests, for: generationRequests)
-        print("request saved")
+    }
+    
+    func saveGeneratedVideo(_ generatedVideo: GeneratedVideo) {
+        let key = generatedVideos
+        var videos = getAllObjects(ofType: GeneratedVideo.self, for: key)
+        videos.append(generatedVideo)
+        saveAllObjects(videos, for: key)
     }
     
     func getRequest(videoID: Int) -> GenerationRequest? {
@@ -52,21 +59,17 @@ final class UserDefaultsService: UserDefaultsServiceProtocol {
         getAllObjects(ofType: GenerationRequest.self, for: generationRequests)
     }
     
+    func getAllGeneratedVideos() -> [GeneratedVideo] {
+        getAllObjects(ofType: GeneratedVideo.self, for: generatedVideos)
+    }
+    
     func removeRequest(videoID: Int) {
         let key = generationRequests
         var requests = getAllObjects(ofType: GenerationRequest.self, for: key)
         if let index = requests.firstIndex(where: { $0.video_id == videoID }) {
             requests.remove(at: index)
-            print("removed request with video_id: \(videoID)")
         }
         saveAllObjects(requests, for: key)
-    }
-    
-    func saveGeneratedVideo(_ generatedVideo: GeneratedVideo) {
-        let key = generatedVideos
-        var videos = getAllObjects(ofType: GeneratedVideo.self, for: key)
-        videos.append(generatedVideo)
-        saveAllObjects(videos, for: key)
     }
     
     func removeGeneratedVideo(url: String) {
@@ -78,13 +81,13 @@ final class UserDefaultsService: UserDefaultsServiceProtocol {
         }
     }
     
-    func getAllObjects<T: Decodable>(ofType type: T.Type, for key: String) -> [T] {
+    private func getAllObjects<T: Decodable>(ofType type: T.Type, for key: String) -> [T] {
         guard let data = userDefaults.data(forKey: key) else { return [] }
         let objects = try? JSONDecoder().decode([T].self, from: data)
         return objects ?? []
     }
     
-    func saveAllObjects<T: Encodable>(_ objects: [T], for key: String) {
+    private func saveAllObjects<T: Encodable>(_ objects: [T], for key: String) {
         let data = try? JSONEncoder().encode(objects)
         userDefaults.set(data, forKey: key)
     }

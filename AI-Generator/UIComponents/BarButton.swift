@@ -7,17 +7,17 @@
 
 import UIKit
 
-class OpenPaywallBarButton: UIButton {
-    init() {
+class BarButton: UIButton {
+    init(title: String, backgroundColor: UIColor, image: UIImage?) {
         super.init(frame: .zero)
-        configure()
-        setupUI()
+        configure(title: title, backgroundColor: backgroundColor, image: image)
+//        setupUI()
     }
     
-    func configure() {
+    func configure(title: String, backgroundColor: UIColor, image: UIImage?) {
         var config = UIButton.Configuration.filled()
         config.cornerStyle = .capsule
-        config.baseBackgroundColor = .appBlue
+        config.baseBackgroundColor = backgroundColor
         config.baseForegroundColor = .white
         config.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { incoming in
             var outgoing = incoming
@@ -25,6 +25,9 @@ class OpenPaywallBarButton: UIButton {
             return outgoing
         }
         configuration = config
+        
+        setTitle(title, for: .normal)
+        setImage(image, for: .normal)
     }
     
     func setupUI() {

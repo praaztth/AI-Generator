@@ -1,14 +1,14 @@
 //
-//  ProfileCoordinator.swift
+//  UseStyleCoordinator.swift
 //  AI-Generator
 //
-//  Created by катенька on 24.06.2025.
+//  Created by катенька on 25.06.2025.
 //
 
 import Foundation
 import RxSwift
 
-class ProfileCoordinator: CoordinatorProtocol {
+class UseStyleCoordinator: CoordinatorProtocol {
     private let disposeBag = DisposeBag()
     
     var childCoordinators = [CoordinatorProtocol]()

@@ -15,7 +15,6 @@ protocol UsePromptViewModelInputs {
 
 protocol UsePromptViewModelOutputs {
     var didTappedOpenPaywall: PublishRelay<Void> { get }
-//    var didTapInputField: PublishRelay<Void> { get }
     var didTapCreate: PublishRelay<Void> { get }
     var promptToGenerate: PublishRelay<String?> { get }
     func setImageName(name: String)
@@ -51,7 +50,6 @@ class UsePromptViewModel: ViewModelConfigurable, UsePromptViewModelInputs, UsePr
     
     // ViewController outputs
     var didTappedOpenPaywall = PublishRelay<Void>()
-//    var didTapInputField = PublishRelay<Void>()
     var didTapCreate = PublishRelay<Void>()
     var promptToGenerate = PublishRelay<String?>()
     
