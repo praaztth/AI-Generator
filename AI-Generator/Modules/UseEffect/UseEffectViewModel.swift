@@ -14,9 +14,11 @@ protocol UseEffectViewModelProtocol {
     var didTapInputField: PublishRelay<Void> { get }
     var didTapCreateButton: PublishRelay<Void> { get }
     var didCloseView: BehaviorSubject<Bool> { get }
+    var didTapOpenPaywall: PublishRelay<Void> { get }
     var objectLoadedDriver: Driver<UseEffectModel?> { get }
     
     var shouldGenerateVideo: Driver<GenerateBy> { get }
+    var shouldOpenPaywall: Observable<Void> { get }
     
     func setImageName(name: String)
     func setImageData(image: UIImage)
@@ -41,11 +43,17 @@ class UseEffectViewModel: UseEffectViewModelProtocol {
     let didTapInputField = PublishRelay<Void>()
     let didTapCreateButton = PublishRelay<Void>()
     let didCloseView = BehaviorSubject<Bool>(value: false)
+    var didTapOpenPaywall = PublishRelay<Void>()
     
     // Coordinator Input
     private let _shouldGenerateVideo = PublishRelay<GenerateBy>()
     var shouldGenerateVideo: Driver<GenerateBy> {
         _shouldGenerateVideo.asDriver(onErrorJustReturn: .prompt(prompt: ""))
+    }
+    
+    private let _shouldOpenPaywall = PublishRelay<Void>()
+    var shouldOpenPaywall: Observable<Void> {
+        _shouldOpenPaywall.asObservable()
     }
     
     lazy var objectLoadedDriver: Driver<UseEffectModel?> = {
@@ -68,6 +76,10 @@ class UseEffectViewModel: UseEffectViewModelProtocol {
                 guard let imageData = self.imageData, let imageName = self.imageName else { return }
                 self._shouldGenerateVideo.accept(.imageTemplate(imageData: imageData, imageName: imageName, templateID: self.effectID))
             })
+            .disposed(by: disposeBag)
+        
+        didTapOpenPaywall
+            .bind(to: _shouldOpenPaywall)
             .disposed(by: disposeBag)
     }
     

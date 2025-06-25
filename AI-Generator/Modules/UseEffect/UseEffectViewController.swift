@@ -34,6 +34,8 @@ class UseEffectViewController: UIViewController {
         bindViewModel()
         bindView()
         loadData()
+        configureNavBar()
+        customView.setUIEnabled(true)
     }
     
     func loadData() {
@@ -73,6 +75,13 @@ class UseEffectViewController: UIViewController {
             .disposed(by: disposeBag)
     }
     
+    func configureNavBar() {
+        let imageBarButton = UIImage(systemName: "sparkles")
+        let barButton = BarButton(title: "PRO", backgroundColor: .appBlue, image: imageBarButton)
+        barButton.addTarget(self, action: #selector(openPaywallButtonTapped), for: .touchUpInside)
+        navigationItem.rightBarButtonItem = UIBarButtonItem(customView: barButton)
+    }
+    
     // TODO: reuse code
     func displayVideoPicker() {
         var configuration = PHPickerConfiguration(photoLibrary: .shared())
@@ -84,6 +93,10 @@ class UseEffectViewController: UIViewController {
         let picker = PHPickerViewController(configuration: configuration)
         picker.delegate = self
         present(picker, animated: true)
+    }
+    
+    @objc func openPaywallButtonTapped() {
+        viewModel.didTapOpenPaywall.accept(())
     }
 }
 

@@ -153,6 +153,14 @@ class PaywallViewModel: ViewModelConfigurable, PaywallViewModelInputs, PaywallVi
     }
     
     func restorePurchases() {
-        
+        DispatchQueue.main.async { [weak self] in
+            SwiftHelper.apphudHelper.restoreAllProducts { [weak self] isSuccess in
+                if isSuccess {
+                    self?._successfullySubscribed.accept(())
+                } else {
+                    self?._unsuccessfullySubscribed.accept(())
+                }
+            }
+        }
     }
 }

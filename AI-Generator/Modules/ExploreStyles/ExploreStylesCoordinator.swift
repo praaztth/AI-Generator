@@ -7,12 +7,18 @@
 
 import Foundation
 import RxSwift
+import RxCocoa
 
 class ExploreStyleCoordinator: CoordinatorProtocol {
     private let disposeBag = DisposeBag()
     
     var childCoordinators = [CoordinatorProtocol]()
     var didFinish = PublishSubject<Void>()
+    
+    private let _shouldOpenPaywall = PublishRelay<Void>()
+    var shouldOpenPaywall: Driver<Void> {
+        _shouldOpenPaywall.asDriver(onErrorJustReturn: ())
+    }
     
     let apiService: PixVerseAPIServiceProtocol
     let storageService: UserDefaultsServiceProtocol
@@ -34,6 +40,10 @@ class ExploreStyleCoordinator: CoordinatorProtocol {
                 self.goToStyle(style: style)
             })
             .disposed(by: disposeBag)
+        
+        viewModel.output.didTapOpenPaywall
+            .bind(to: _shouldOpenPaywall)
+            .disposed(by: disposeBag)
     }
     
     func goToStyle(style: Style) {
@@ -45,6 +55,10 @@ class ExploreStyleCoordinator: CoordinatorProtocol {
             .subscribe(onNext: {
                 self.childDidFinished(child: coordinator)
             })
+            .disposed(by: disposeBag)
+        
+        coordinator.shouldOpenPaywall
+            .bind(to: _shouldOpenPaywall)
             .disposed(by: disposeBag)
     }
     

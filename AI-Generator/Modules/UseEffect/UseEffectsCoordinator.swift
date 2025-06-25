@@ -23,6 +23,11 @@ final class UseEffectsCoordinator: CoordinatorProtocol {
     
     var didFinish = PublishSubject<Void>()
     
+    private let _shouldOpenPaywall = PublishRelay<Void>()
+    var shouldOpenPaywall: Observable<Void> {
+        _shouldOpenPaywall.asObservable()
+    }
+    
     init(effectID: Int, apiService: PixVerseAPIServiceProtocol, storageService: UserDefaultsServiceProtocol, navigationController: UINavigationController) {
         self.effectID = effectID
         self.apiService = apiService
@@ -48,6 +53,10 @@ final class UseEffectsCoordinator: CoordinatorProtocol {
             .drive { generateBy in
                 self.goToVideoGeneration(generateBy: generateBy)
             }
+            .disposed(by: disposeBag)
+        
+        viewModel?.shouldOpenPaywall
+            .bind(to: _shouldOpenPaywall)
             .disposed(by: disposeBag)
     }
     

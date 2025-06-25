@@ -84,7 +84,7 @@ class ExploreStylesViewController: UIViewController, ViewControllerConfigurable 
     }
     
     @objc func openPaywallButtonTapped() {
-//        viewModel.didTapOpenPaywall()
+        viewModel.output.didTapOpenPaywall.accept(())
     }
     
     func configureDataSource() -> RxCollectionViewSectionedReloadDataSource<SectionOfStyles> {

@@ -56,6 +56,10 @@ final class ExploreTemplatesCoordinator: CoordinatorProtocol {
                 self.childDidFinished(child: coordinator)
             })
             .disposed(by: disposeBag)
+        
+        coordinator.shouldOpenPaywall
+            .bind(to: _openPaywallEvent)
+            .disposed(by: disposeBag)
     }
     
     func goToResultView(videoURL: URL) {

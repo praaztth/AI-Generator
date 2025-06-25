@@ -33,10 +33,12 @@ class UseStyleViewController: UIViewController {
     override func viewDidLoad() {
         bindViewModel()
         bindView()
-        loadData()
+        configureNavBar()
     }
     
-    func loadData() {
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
         viewModel.output.loadData.accept(())
     }
     
@@ -70,6 +72,23 @@ class UseStyleViewController: UIViewController {
                 self?.displayVideoPicker()
             })
             .disposed(by: disposeBag)
+        
+        viewModel.input.proAccessAvailableDriver
+            .drive(onNext: { [weak self] isAvailable in
+                self?.setUIEnabled(isAvailable)
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    func configureNavBar() {
+        let imageBarButton = UIImage(systemName: "sparkles")
+        let barButton = BarButton(title: "PRO", backgroundColor: .appBlue, image: imageBarButton)
+        barButton.addTarget(self, action: #selector(openPaywallButtonTapped), for: .touchUpInside)
+        navigationItem.rightBarButtonItem = UIBarButtonItem(customView: barButton)
+    }
+    
+    func setUIEnabled(_ isEnabled: Bool) {
+        customView.setUIEnabled(isEnabled)
     }
     
     // TODO: reuse code
@@ -83,6 +102,10 @@ class UseStyleViewController: UIViewController {
         let picker = PHPickerViewController(configuration: configuration)
         picker.delegate = self
         present(picker, animated: true)
+    }
+    
+    @objc func openPaywallButtonTapped() {
+        viewModel.output.didTapOpenPaywall.accept(())
     }
 }
 

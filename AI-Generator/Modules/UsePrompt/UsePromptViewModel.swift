@@ -8,15 +8,18 @@
 import Foundation
 import RxSwift
 import RxCocoa
+import SwiftHelper
 
 protocol UsePromptViewModelInputs {
     var clearInputDataDriver: Driver<Void> { get }
+    var proAccessAvailableDriver: Driver<Bool> { get }
 }
 
 protocol UsePromptViewModelOutputs {
     var didTappedOpenPaywall: PublishRelay<Void> { get }
     var didTapCreate: PublishRelay<Void> { get }
     var promptToGenerate: PublishRelay<String?> { get }
+    var loadData: PublishRelay<Void> { get }
     func setImageName(name: String)
     func setImageData(image: UIImage)
 }
@@ -48,10 +51,16 @@ class UsePromptViewModel: ViewModelConfigurable, UsePromptViewModelInputs, UsePr
         _clearInputData.asDriver(onErrorJustReturn: ())
     }
     
+    private let _proAccessAvailable = PublishRelay<Bool>()
+    var proAccessAvailableDriver: Driver<Bool> {
+        _proAccessAvailable.asDriver(onErrorJustReturn: false)
+    }
+    
     // ViewController outputs
     var didTappedOpenPaywall = PublishRelay<Void>()
     var didTapCreate = PublishRelay<Void>()
     var promptToGenerate = PublishRelay<String?>()
+    var loadData = PublishRelay<Void>()
     
     // Coordinator inputs
     private let _shouldOpenPaywall = PublishRelay<Void>()
@@ -95,6 +104,12 @@ class UsePromptViewModel: ViewModelConfigurable, UsePromptViewModelInputs, UsePr
                 self._clearInputData.accept(())
             })
             .disposed(by: disposeBag)
+        
+        loadData
+            .subscribe(onNext: {
+                self.checkSubscriptionStatus()
+            })
+            .disposed(by: disposeBag)
     }
     
     func setImageName(name: String) {
@@ -104,5 +119,14 @@ class UsePromptViewModel: ViewModelConfigurable, UsePromptViewModelInputs, UsePr
     func setImageData(image: UIImage) {
         self.imageData = image.jpegData(compressionQuality: 0.5)
         print("размер файла: \(imageData?.count ?? 0)")
+    }
+    
+    func checkSubscriptionStatus() {
+        DispatchQueue.main.async { [weak self] in
+            SwiftHelper.apphudHelper.restoreAllProducts { _ in
+                let isProUser = SwiftHelper.apphudHelper.isProUser()
+                self?._proAccessAvailable.accept(isProUser)
+            }
+        }
     }
 }

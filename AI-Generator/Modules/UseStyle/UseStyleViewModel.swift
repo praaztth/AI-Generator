@@ -8,15 +8,18 @@
 import Foundation
 import RxSwift
 import RxCocoa
+import SwiftHelper
 
 protocol UseStylesViewModelInputs {
     var modelToDisplay: Driver<UseEffectModel> { get }
+    var proAccessAvailableDriver: Driver<Bool> { get }
 }
 
 protocol UseStylesViewModelOutputs {
     var loadData: PublishRelay<Void> { get }
     var didTapInputField: PublishRelay<Void> { get }
     var didTapCreateButton: PublishRelay<Void> { get }
+    var didTapOpenPaywall: PublishRelay<Void> { get }
     func setVideoData(with url: URL)
 }
 
@@ -27,6 +30,7 @@ protocol UseStylesViewModelToView {
 
 protocol UseStylesViewModelToCoordinator {
     var shouldGenerateVideo: Driver<GenerateBy> { get }
+    var shouldOpenPaywall: Observable<Void> { get }
 }
 
 class UseStyleViewModel: ViewModelConfigurable, UseStylesViewModelInputs, UseStylesViewModelOutputs, UseStylesViewModelToView, UseStylesViewModelToCoordinator {
@@ -46,15 +50,26 @@ class UseStyleViewModel: ViewModelConfigurable, UseStylesViewModelInputs, UseSty
         _modelToDisplay.asDriver(onErrorJustReturn: UseEffectModel.empty())
     }
     
+    private let _proAccessAvailable = PublishRelay<Bool>()
+    var proAccessAvailableDriver: Driver<Bool> {
+        _proAccessAvailable.asDriver(onErrorJustReturn: false)
+    }
+    
     // ViewController Outputs
     var loadData = PublishRelay<Void>()
     var didTapInputField = PublishRelay<Void>()
     var didTapCreateButton = PublishRelay<Void>()
+    var didTapOpenPaywall = PublishRelay<Void>()
     
     // Coordinator Inputs
     private let _shouldGenerateVideo = PublishRelay<GenerateBy>()
     var shouldGenerateVideo: Driver<GenerateBy> {
         _shouldGenerateVideo.asDriver(onErrorJustReturn: .prompt(prompt: ""))
+    }
+    
+    private let _shouldOpenPaywall = PublishRelay<Void>()
+    var shouldOpenPaywall: Observable<Void> {
+        _shouldOpenPaywall.asObservable()
     }
     
     init(apiService: PixVerseAPIServiceProtocol, storageService: UserDefaultsServiceProtocol, style: Style) {
@@ -70,6 +85,7 @@ class UseStyleViewModel: ViewModelConfigurable, UseStylesViewModelInputs, UseSty
             .subscribe(onNext: {
                 let objectToDisplay = UseEffectModel(title: self.style.name, templateId: self.style.template_id, videoURL: URL(string: self.style.preview_large))
                 self._modelToDisplay.accept(objectToDisplay)
+                self.checkSubscriptionStatus()
             })
             .disposed(by: disposeBag)
         
@@ -79,6 +95,10 @@ class UseStyleViewModel: ViewModelConfigurable, UseStylesViewModelInputs, UseSty
                       let videoName = self.videoName else { return }
                 self._shouldGenerateVideo.accept(.videoStyle(videoData: videoData, videoName: videoName, templateID: String(self.style.template_id)))
             })
+            .disposed(by: disposeBag)
+        
+        didTapOpenPaywall
+            .bind(to: _shouldOpenPaywall)
             .disposed(by: disposeBag)
     }
     
@@ -90,5 +110,14 @@ class UseStyleViewModel: ViewModelConfigurable, UseStylesViewModelInputs, UseSty
             print("\(#file): \(error)")
         }
         print("размер файла: \(self.videoData?.count ?? 0)")
+    }
+    
+    func checkSubscriptionStatus() {
+        DispatchQueue.main.async { [weak self] in
+            SwiftHelper.apphudHelper.restoreAllProducts { _ in
+                let isProUser = SwiftHelper.apphudHelper.isProUser()
+                self?._proAccessAvailable.accept(isProUser)
+            }
+        }
     }
 }

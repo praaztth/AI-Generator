@@ -33,12 +33,16 @@ class UseEffectView: UIView {
         return view
     }()
     
-    let inputFieldButton = UIButton.createInputImageButton(emptyIcon: UIImage(systemName: "photo.on.rectangle.angled"), emptyText: "Upload Photo")
+    let inputFieldButton = UIButton.createInputImageButton(emptyIcon: UIImage(systemName: "photo.on.rectangle.angled"), enabledStateText: "Tap here to add a photo if you'd like to supplement the generation", disabledStateText: "Unlock this feature with a PRO subscription and get access to all premium benefits")
     
     init() {
         super.init(frame: .zero)
         setupUI()
         setupConstraints()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
     func setupUI() {
@@ -51,6 +55,9 @@ class UseEffectView: UIView {
         
         errorContainerView.addSubview(errorImageView)
         errorContainerView.isHidden = true
+        
+        inputFieldButton.isEnabled = false
+        createButton.isEnabled = false
         
         addSubview(playerView)
         addSubview(titleLabel)
@@ -134,8 +141,9 @@ class UseEffectView: UIView {
         errorContainerView.isHidden = false
     }
     
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+    func setUIEnabled(_ isEnabled: Bool) {
+        inputFieldButton.isEnabled = isEnabled
+        createButton.isEnabled = isEnabled
     }
 }
 

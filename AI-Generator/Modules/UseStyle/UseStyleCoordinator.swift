@@ -7,12 +7,18 @@
 
 import Foundation
 import RxSwift
+import RxCocoa
 
 class UseStyleCoordinator: CoordinatorProtocol {
     private let disposeBag = DisposeBag()
     
     var childCoordinators = [CoordinatorProtocol]()
     var didFinish = PublishSubject<Void>()
+    
+    private let _shouldOpenPaywall = PublishRelay<Void>()
+    var shouldOpenPaywall: Observable<Void> {
+        _shouldOpenPaywall.asObservable()
+    }
     
     let apiService: PixVerseAPIServiceProtocol
     let storageService: UserDefaultsServiceProtocol
@@ -36,6 +42,10 @@ class UseStyleCoordinator: CoordinatorProtocol {
             .drive(onNext: { generateBy in
                 self.goToVideoGeneration(generateBy: generateBy)
             })
+            .disposed(by: disposeBag)
+        
+        viewModelInput.shouldOpenPaywall
+            .bind(to: _shouldOpenPaywall)
             .disposed(by: disposeBag)
     }
     

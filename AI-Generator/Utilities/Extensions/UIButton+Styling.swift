@@ -8,15 +8,16 @@
 import UIKit
 
 extension UIButton {
-    public static func createInputImageButton(emptyIcon: UIImage?, emptyText: String) -> UIButton {
+    public static func createInputImageButton(emptyIcon: UIImage?, enabledStateText: String, disabledStateText: String? = nil) -> UIButton {
         var config = UIButton.Configuration.bordered()
         config.image = emptyIcon
         config.imagePlacement = .all
-        config.title = emptyText
         config.baseBackgroundColor = .appDark
         config.baseForegroundColor = .appPaleGrey30
         
         let button = UIButton(configuration: config)
+        button.setTitle(enabledStateText, for: .normal)
+        button.setTitle(disabledStateText, for: .disabled)
         button.contentMode = .scaleAspectFill
         button.layer.cornerRadius = 32
         button.layer.borderWidth = 1

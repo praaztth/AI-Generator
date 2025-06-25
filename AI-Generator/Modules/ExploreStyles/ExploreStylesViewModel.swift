@@ -16,6 +16,7 @@ protocol ExploreStylesViewModelInputs {
 protocol ExploreStylesViewModelOutputs {
     var loadTrigger: PublishRelay<Void> { get }
     var didSelectStyle: PublishRelay<Style> { get }
+    var didTapOpenPaywall: PublishRelay<Void> { get }
 }
 
 protocol ExploreStylesViewModelToView {
@@ -25,6 +26,7 @@ protocol ExploreStylesViewModelToView {
 
 protocol ExploreStylesViewModelToCoordinator {
     var shouldOpenStyle: Driver<Style> { get }
+    var shouldOpenPaywall: Driver<Void> { get }
 }
 
 class ExploreStylesViewModel: ViewModelConfigurable, ExploreStylesViewModelInputs, ExploreStylesViewModelOutputs, ExploreStylesViewModelToView, ExploreStylesViewModelToCoordinator {
@@ -46,11 +48,17 @@ class ExploreStylesViewModel: ViewModelConfigurable, ExploreStylesViewModelInput
     // ViewController Outputs
     var loadTrigger = PublishRelay<Void>()
     var didSelectStyle = PublishRelay<Style>()
+    var didTapOpenPaywall = PublishRelay<Void>()
     
     // Coordinator Inputs
     private let _shouldOpenStyle = PublishRelay<Style>()
     var shouldOpenStyle: Driver<Style> {
         _shouldOpenStyle.asDriver(onErrorJustReturn: Style.empty())
+    }
+    
+    private let _shouldOpenPaywall = PublishRelay<Void>()
+    var shouldOpenPaywall: Driver<Void> {
+        _shouldOpenPaywall.asDriver(onErrorJustReturn: ())
     }
     
     init(apiService: PixVerseAPIServiceProtocol, storageService: UserDefaultsServiceProtocol, cacheService: CacheServiceProtocol) {
@@ -72,6 +80,10 @@ class ExploreStylesViewModel: ViewModelConfigurable, ExploreStylesViewModelInput
             .subscribe(onNext: { selectedStyle in
                 self._shouldOpenStyle.accept(selectedStyle)
             })
+            .disposed(by: disposeBag)
+        
+        didTapOpenPaywall
+            .bind(to: _shouldOpenPaywall)
             .disposed(by: disposeBag)
     }
     

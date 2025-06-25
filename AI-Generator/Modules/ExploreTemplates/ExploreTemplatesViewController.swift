@@ -44,14 +44,6 @@ class ExploreTemplatesViewController: UIViewController {
         bindViewModel()
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        
-        Apphud.restorePurchases { _, _, _ in
-            self.updateProButton()
-        }
-    }
-    
     func bindViewModel() {
         let dataSource = configureDataSource()
         
@@ -81,6 +73,11 @@ class ExploreTemplatesViewController: UIViewController {
     func configureNavBar() {
         navigationController?.configureNavigationBar()
         navigationItem.title = "Templates"
+        
+        let imageBarButton = UIImage(systemName: "sparkles")
+        let barButton = BarButton(title: "PRO", backgroundColor: .appBlue, image: imageBarButton)
+        barButton.addTarget(self, action: #selector(openPaywallButtonTapped), for: .touchUpInside)
+        navigationItem.rightBarButtonItem = UIBarButtonItem(customView: barButton)
     }
     
     @objc func openPaywallButtonTapped() {

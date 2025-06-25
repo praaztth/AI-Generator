@@ -17,12 +17,16 @@ class UsePromptViewController: UIViewController, ViewControllerConfigurable {
     private let disposeBag = DisposeBag()
     
     private let promtView = PromptView()
-    private let inputFieldButton = UIButton.createInputImageButton(emptyIcon: UIImage(systemName: "photo.on.rectangle.angled"), emptyText: "Tap here to add a photo if you'd like to supplement the generation")
+    private let inputFieldButton = UIButton.createInputImageButton(emptyIcon: UIImage(systemName: "photo.on.rectangle.angled"), enabledStateText: "Tap here to add a photo if you'd like to supplement the generation", disabledStateText: "Unlock this feature with a PRO subscription and get access to all premium benefits")
     private let createButton = SwiftHelper.uiHelper.customAnimateButton(bgColor: .appDark, bgImage: nil, title: "Create", titleColor: .white, fontTitleColor: .systemFont(ofSize: 16), cornerRadius: 32, borderWidth: nil, borderColor: nil)
     
     init(viewModel: UsePromptViewModelToView) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
     override func viewDidLoad() {
@@ -33,8 +37,10 @@ class UsePromptViewController: UIViewController, ViewControllerConfigurable {
         bindViewModel()
     }
     
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        self.viewModel.output.loadData.accept(())
     }
     
     func setupUI() {
@@ -45,6 +51,7 @@ class UsePromptViewController: UIViewController, ViewControllerConfigurable {
         view.addSubview(inputFieldButton)
         view.addSubview(createButton)
         
+        inputFieldButton.isEnabled = false
         promtView.setTextViewDelegate(delegate: self)
         createButton.isEnabled = false
         
@@ -66,7 +73,7 @@ class UsePromptViewController: UIViewController, ViewControllerConfigurable {
         }
         
         createButton.snp.makeConstraints { make in
-            make.bottom.leading.trailing.equalTo(view.safeAreaLayoutGuide)
+            make.bottom.leading.trailing.equalTo(view.safeAreaLayoutGuide).inset(28)
             make.height.equalTo(60)
         }
     }
@@ -89,6 +96,17 @@ class UsePromptViewController: UIViewController, ViewControllerConfigurable {
                 self.inputFieldButton.removeInputImage(emptyIcon: UIImage(systemName: "photo.on.rectangle.angled")!)
             })
             .disposed(by: disposeBag)
+        
+        viewModel.input.proAccessAvailableDriver
+            .drive(onNext: { [weak self] isAvailable in
+                self?.setUIEnabled(isAvailable)
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    func setUIEnabled(_ isEnabled: Bool) {
+        inputFieldButton.isEnabled = isEnabled
+        
     }
     
     func displayImagePicker() {

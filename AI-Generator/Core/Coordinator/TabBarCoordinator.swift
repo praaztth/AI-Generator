@@ -60,6 +60,12 @@ class TabBarCoordinator: CoordinatorProtocol {
                 self.showPayWall()
             })
             .disposed(by: disposeBag)
+        
+        stylesExploreCoordinator.shouldOpenPaywall
+            .drive(onNext: {
+                self.showPayWall()
+            })
+            .disposed(by: disposeBag)
     }
     
     func showPayWall() {
