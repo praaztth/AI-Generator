@@ -18,6 +18,7 @@ protocol UseEffectViewModelProtocol {
     var objectLoadedDriver: Driver<UseEffectModel?> { get }
     
     var shouldGenerateVideo: Driver<GenerateBy> { get }
+    var shouldShowAlert: Driver<String> { get }
     var shouldOpenPaywall: Observable<Void> { get }
     
     func setImageName(name: String)
@@ -51,6 +52,11 @@ class UseEffectViewModel: UseEffectViewModelProtocol {
         _shouldGenerateVideo.asDriver(onErrorJustReturn: .prompt(prompt: ""))
     }
     
+    private let _shouldShowAlert = PublishRelay<String>()
+    var shouldShowAlert: Driver<String> {
+        _shouldShowAlert.asDriver(onErrorJustReturn: "")
+    }
+    
     private let _shouldOpenPaywall = PublishRelay<Void>()
     var shouldOpenPaywall: Observable<Void> {
         _shouldOpenPaywall.asObservable()
@@ -74,6 +80,11 @@ class UseEffectViewModel: UseEffectViewModelProtocol {
         didTapCreateButton
             .subscribe(onNext: {
                 guard let imageData = self.imageData, let imageName = self.imageName else { return }
+                let generationRequests = self.storageService.getAllRequests()
+                guard generationRequests.count < 2 else {
+                    self._shouldShowAlert.accept("You can only run up to 2 generations at the same time")
+                    return
+                }
                 self._shouldGenerateVideo.accept(.imageTemplate(imageData: imageData, imageName: imageName, templateID: self.effectID))
             })
             .disposed(by: disposeBag)

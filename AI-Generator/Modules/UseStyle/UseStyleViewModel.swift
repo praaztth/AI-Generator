@@ -31,6 +31,7 @@ protocol UseStylesViewModelToView {
 protocol UseStylesViewModelToCoordinator {
     var shouldGenerateVideo: Driver<GenerateBy> { get }
     var shouldOpenPaywall: Observable<Void> { get }
+    var shouldShowAlert: Driver<String> { get }
 }
 
 class UseStyleViewModel: ViewModelConfigurable, UseStylesViewModelInputs, UseStylesViewModelOutputs, UseStylesViewModelToView, UseStylesViewModelToCoordinator {
@@ -67,6 +68,11 @@ class UseStyleViewModel: ViewModelConfigurable, UseStylesViewModelInputs, UseSty
         _shouldGenerateVideo.asDriver(onErrorJustReturn: .prompt(prompt: ""))
     }
     
+    private let _shouldShowAlert = PublishRelay<String>()
+    var shouldShowAlert: Driver<String> {
+        _shouldShowAlert.asDriver(onErrorJustReturn: "")
+    }
+    
     private let _shouldOpenPaywall = PublishRelay<Void>()
     var shouldOpenPaywall: Observable<Void> {
         _shouldOpenPaywall.asObservable()
@@ -93,6 +99,13 @@ class UseStyleViewModel: ViewModelConfigurable, UseStylesViewModelInputs, UseSty
             .subscribe(onNext: {
                 guard let videoData = self.videoData,
                       let videoName = self.videoName else { return }
+                
+                let generationRequests = self.storageService.getAllRequests()
+                guard generationRequests.count < 2 else {
+                    self._shouldShowAlert.accept("You can only run up to 2 generations at the same time")
+                    return
+                }
+                
                 self._shouldGenerateVideo.accept(.videoStyle(videoData: videoData, videoName: videoName, templateID: String(self.style.template_id)))
             })
             .disposed(by: disposeBag)

@@ -35,13 +35,29 @@ class ProfileCoordinator: CoordinatorProtocol {
         let viewController = ProfileViewController(viewModel: viewModel)
         navigationController.viewControllers = [viewController]
         
-        let viewModelOutput = viewModel as ProfileViewModelToCoordinator
+        let viewModelInput = viewModel as ProfileViewModelToCoordinator
         
-        viewModelOutput.shouldOpenSettings
+        viewModelInput.shouldOpenSettings
             .drive(onNext: {
                 self.goToSettings()
             })
             .disposed(by: disposeBag)
+        
+        viewModelInput.shouldOpenVideo
+            .drive { url in
+                self.goToVideo(videoURL: url)
+            }
+            .disposed(by: disposeBag)
+    }
+    
+    func goToVideo(videoURL: URL) {
+        let coordinator = VideoResultCoordinator(videoURL: videoURL, navigationController: navigationController, storageService: storageService)
+        coordinator.start()
+        childCoordinators.append(coordinator)
+        
+        coordinator.didFinish.subscribe(onNext: {
+            self.childDidFinished(child: coordinator)
+        }).disposed(by: disposeBag)
     }
     
     func goToSettings() {

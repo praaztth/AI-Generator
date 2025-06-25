@@ -32,6 +32,7 @@ protocol UsePromptViewModelToView {
 protocol UsePromptViewModelToCoordinator {
     var shouldOpenPaywall: Observable<Void> { get }
     var shouldGenerateVideo: Driver<GenerateBy> { get }
+    var shouldShowAlert: Driver<String> { get }
 }
 
 class UsePromptViewModel: ViewModelConfigurable, UsePromptViewModelInputs, UsePromptViewModelOutputs, UsePromptViewModelToView, UsePromptViewModelToCoordinator {
@@ -72,6 +73,11 @@ class UsePromptViewModel: ViewModelConfigurable, UsePromptViewModelInputs, UsePr
         _shouldGenerateVideo.asDriver(onErrorJustReturn: .prompt(prompt: ""))
     }
     
+    private let _shouldShowAlert = PublishRelay<String>()
+    var shouldShowAlert: Driver<String> {
+        _shouldShowAlert.asDriver(onErrorJustReturn: "")
+    }
+    
     init(apiService: PixVerseAPIServiceProtocol, storageService: UserDefaultsServiceProtocol) {
         self.apiService = apiService
         self.storageService = storageService
@@ -93,6 +99,12 @@ class UsePromptViewModel: ViewModelConfigurable, UsePromptViewModelInputs, UsePr
         didTapCreate
             .subscribe(onNext: {
                 guard let prompt = self.prompt else { return }
+                
+                let generationRequests = self.storageService.getAllRequests()
+                guard generationRequests.count < 2 else {
+                    self._shouldShowAlert.accept("You can only run up to 2 generations at the same time")
+                    return
+                }
                 
                 if let imageData = self.imageData,
                    let imageName = self.self.imageName {

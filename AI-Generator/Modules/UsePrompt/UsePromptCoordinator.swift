@@ -45,6 +45,12 @@ class UsePromptCoordinator: CoordinatorProtocol {
             }
             .disposed(by: disposeBag)
         
+        viewModelInput.shouldShowAlert
+            .drive(onNext: { text in
+                self.showAlert(message: text)
+            })
+            .disposed(by: disposeBag)
+        
     }
     
     func goToVideoGeneration(generateBy: GenerateBy) {
@@ -55,6 +61,12 @@ class UsePromptCoordinator: CoordinatorProtocol {
         coordinator.didFinish.subscribe(onNext: {
             self.childDidFinished(child: coordinator)
         }).disposed(by: disposeBag)
+    }
+    
+    func showAlert(message: String) {
+        let alertController = UIAlertController(title: nil, message: message, preferredStyle: .alert)
+        alertController.addAction(UIAlertAction(title: "OK", style: .default))
+        navigationController.present(alertController, animated: true)
     }
     
     func finish() {

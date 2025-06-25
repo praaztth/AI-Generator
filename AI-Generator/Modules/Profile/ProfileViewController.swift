@@ -72,6 +72,12 @@ class ProfileViewController: UIViewController, ViewControllerConfigurable {
         viewModel.input.sectionedVideosDriver
             .drive(collectionView.rx.items(dataSource: dataSource))
             .disposed(by: disposeBag)
+        
+        collectionView.rx.modelSelected(GeneratedVideoCellModel.self)
+            .subscribe(onNext: { videoCellModel in
+                self.viewModel.output.didSelectVideo.accept(videoCellModel)
+            })
+            .disposed(by: disposeBag)
     }
     
     func configureNavBar() {

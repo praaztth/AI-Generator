@@ -55,9 +55,21 @@ final class UseEffectsCoordinator: CoordinatorProtocol {
             }
             .disposed(by: disposeBag)
         
+        viewModel?.shouldShowAlert
+            .drive(onNext: { text in
+                self.showAlert(message: text)
+            })
+            .disposed(by: disposeBag)
+        
         viewModel?.shouldOpenPaywall
             .bind(to: _shouldOpenPaywall)
             .disposed(by: disposeBag)
+    }
+    
+    func showAlert(message: String) {
+        let alertController = UIAlertController(title: nil, message: message, preferredStyle: .alert)
+        alertController.addAction(UIAlertAction(title: "OK", style: .default))
+        navigationController.present(alertController, animated: true)
     }
     
     func finish() {

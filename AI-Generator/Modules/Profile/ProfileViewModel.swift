@@ -17,6 +17,7 @@ protocol ProfileViewModelInputs {
 protocol ProfileViewModelOutputs {
     var loadTrigger: PublishRelay<Void> { get }
     var didTapSettings: PublishRelay<Void> { get }
+    var didSelectVideo: PublishRelay<GeneratedVideoCellModel> { get }
 }
 
 protocol ProfileViewModelToView {
@@ -26,6 +27,7 @@ protocol ProfileViewModelToView {
 
 protocol ProfileViewModelToCoordinator {
     var shouldOpenSettings: Driver<Void> { get }
+    var shouldOpenVideo: Driver<URL> { get }
 }
 
 class ProfileViewModel: ViewModelConfigurable, ProfileViewModelInputs, ProfileViewModelOutputs, ProfileViewModelToView, ProfileViewModelToCoordinator {
@@ -46,11 +48,17 @@ class ProfileViewModel: ViewModelConfigurable, ProfileViewModelInputs, ProfileVi
     // ViewController Outputs
     var loadTrigger = PublishRelay<Void>()
     var didTapSettings = PublishRelay<Void>()
+    var didSelectVideo = PublishRelay<GeneratedVideoCellModel>()
     
     // Coordinator Inputs
     private let _shouldOpenSettings = PublishRelay<Void>()
     var shouldOpenSettings: Driver<Void> {
         _shouldOpenSettings.asDriver(onErrorJustReturn: ())
+    }
+    
+    private let _shouldOpenVideo = PublishRelay<URL>()
+    var shouldOpenVideo: Driver<URL> {
+        _shouldOpenVideo.asDriver(onErrorJustReturn: URL(string: "https://example.com")!)
     }
     
     init(apiService: PixVerseAPIServiceProtocol, storageService: UserDefaultsServiceProtocol) {
@@ -69,6 +77,11 @@ class ProfileViewModel: ViewModelConfigurable, ProfileViewModelInputs, ProfileVi
         
         didTapSettings
             .bind(to: _shouldOpenSettings)
+            .disposed(by: disposeBag)
+        
+        didSelectVideo
+            .map { $0.videoURL }
+            .bind(to: _shouldOpenVideo)
             .disposed(by: disposeBag)
     }
     
