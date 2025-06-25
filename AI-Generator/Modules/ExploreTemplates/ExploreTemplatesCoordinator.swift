@@ -58,21 +58,6 @@ final class ExploreTemplatesCoordinator: CoordinatorProtocol {
             .disposed(by: disposeBag)
     }
     
-    func showPaywall() {
-        let coordinator = PaywallCoordinator()
-        coordinator.start()
-        childCoordinators.append(coordinator)
-        
-        coordinator.didFinish.subscribe(onNext: {
-            self.childDidFinished(child: coordinator)
-        }).disposed(by: disposeBag)
-    }
-    
-//    func goToLoadingView() {
-//        let viewController = VideoGenerationProcessViewController()
-//        navigationController.pushViewController(viewController, animated: true)
-//    }
-    
     func goToResultView(videoURL: URL) {
         let coordinator = VideoResultCoordinator(videoURL: videoURL, navigationController: navigationController, storageService: storageService)
         coordinator.start()

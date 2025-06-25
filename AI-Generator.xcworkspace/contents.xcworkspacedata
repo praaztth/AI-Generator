@@ -2,6 +2,9 @@
 <Workspace
    version = "1.0">
    <FileRef
+      location = "group:LocalStoreKit.storekit">
+   </FileRef>
+   <FileRef
       location = "group:AI-Generator.xcodeproj">
    </FileRef>
    <FileRef

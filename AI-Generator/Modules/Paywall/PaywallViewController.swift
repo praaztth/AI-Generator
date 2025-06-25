@@ -7,14 +7,9 @@
 
 import UIKit
 import RxSwift
+import SwiftHelper
 
-protocol PaywallViewControllerOutput {
-    func didSelectedUpperButton()
-    func didSelectedLowerButton()
-    func didTappedSubscribeButton()
-}
-
-class PaywallViewController: UIViewController {
+class PaywallViewController: UIViewController, ViewControllerConfigurable {
     // TODO: добавить градиент в границу выбранной option button и в subscribe кнопку
     // TODO: добавить серые кнопки с макета под subscription кнопкой
     let backgroundImageView: UIImageView = {
@@ -39,14 +34,32 @@ class PaywallViewController: UIViewController {
         return stack
     }()
     
-    let upperButton = SelectableOptionButton(leftTitle: "Weekly", leftSubtitle: "Just $ 9.99 per month", rightTitle: "$9.99", rightSubtitle: "right now")
-    let lowerButton = SelectableOptionButton(leftTitle: "Yearly", leftSubtitle: "Just $ 99.99 per year", rightTitle: "$8.33", rightSubtitle: "per month")
+    let optionButtonsStack: UIStackView = {
+        let stack = UIStackView()
+        stack.axis = .vertical
+        stack.spacing = 10
+        stack.alignment = .fill
+        return stack
+    }()
+    
+    let restorePurchasesButton = SwiftHelper.uiHelper.customAnimateButton(bgColor: .clear, bgImage: nil, title: "Restore Purchases", titleColor: .appGrey, fontTitleColor: .systemFont(ofSize: 12), cornerRadius: nil, borderWidth: nil, borderColor: nil)
+    
+    let closeButton: UIButton = {
+        var config = UIButton.Configuration.plain()
+        config.baseForegroundColor = .white
+        config.baseBackgroundColor = .clear
+        config.image = UIImage(systemName: "xmark")
+        let button = UIButton(configuration: config)
+        return button
+    }()
+    
     let subscribeButton = PrimaryButton(color: .appBlue)
     let gradientView = GradientView()
     
-    let viewModel: PaywallViewControllerOutput
+    private let viewModel: PaywallViewModelToView
+    private let disposeBag = DisposeBag()
     
-    init(viewModel: PaywallViewControllerOutput) {
+    init(viewModel: PaywallViewModelToView) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
@@ -58,6 +71,9 @@ class PaywallViewController: UIViewController {
     override func viewDidLoad() {
         setupUI()
         setupConstraints()
+        bindViewModel()
+        
+        viewModel.output.loadTrigger.accept(())
     }
     
     func setupUI() {
@@ -66,6 +82,7 @@ class PaywallViewController: UIViewController {
         view.addSubview(backgroundImageView)
         view.addSubview(gradientView)
         view.addSubview(titleLabel)
+        
         backgroundImageView.image = UIImage(named: "paywallBackground")
         titleLabel.text = "Try Pro version"
         
@@ -80,20 +97,16 @@ class PaywallViewController: UIViewController {
         }
         
         view.addSubview(descriptionViewStack)
-        
-        upperButton.isSelected = true
-        upperButton.addTarget(self, action: #selector(didSelectedUpperButton(_:)), for: .valueChanged)
-        lowerButton.addTarget(self, action: #selector(didSelectedLowerButton(_:)), for: .valueChanged)
-        view.addSubview(upperButton)
-        view.addSubview(lowerButton)
+        view.addSubview(optionButtonsStack)
         
         subscribeButton.setTitle("Subscribe", for: .normal)
         subscribeButton.addTarget(self, action: #selector(didTappedSubscribeButton), for: .touchUpInside)
-        view.addSubview(subscribeButton)
-    }
-    
-    func bindViewModel() {
+        restorePurchasesButton.addTarget(self, action: #selector(didTappedRestorePurchasesButton), for: .touchUpInside)
+        closeButton.addTarget(self, action: #selector(didTappedCloseButton), for: .touchUpInside)
         
+        view.addSubview(subscribeButton)
+        view.addSubview(restorePurchasesButton)
+        view.addSubview(closeButton)
     }
     
     func setupConstraints() {
@@ -110,29 +123,27 @@ class PaywallViewController: UIViewController {
         descriptionViewStack.snp.makeConstraints { make in
             make.leading.equalTo(view.safeAreaLayoutGuide).offset(16)
             make.trailing.equalTo(view.safeAreaLayoutGuide).offset(-16)
-            make.bottom.equalTo(upperButton.snp.top).offset(-24)
+            make.bottom.equalTo(optionButtonsStack.snp.top).offset(-24)
             make.height.equalTo(118)
         }
         
-        upperButton.snp.makeConstraints { make in
-            make.leading.equalTo(view.safeAreaLayoutGuide).offset(16)
-            make.trailing.equalTo(view.safeAreaLayoutGuide).offset(-16)
-            make.bottom.equalTo(lowerButton.snp.top).offset(-10)
-            make.height.equalTo(66)
-        }
-        
-        lowerButton.snp.makeConstraints { make in
+        optionButtonsStack.snp.makeConstraints { make in
             make.leading.equalTo(view.safeAreaLayoutGuide).offset(16)
             make.trailing.equalTo(view.safeAreaLayoutGuide).offset(-16)
             make.bottom.equalTo(subscribeButton.snp.top).offset(-20)
-            make.height.equalTo(66)
         }
         
         subscribeButton.snp.makeConstraints { make in
             make.leading.equalTo(view.safeAreaLayoutGuide).offset(16)
             make.trailing.equalTo(view.safeAreaLayoutGuide).offset(-16)
-            make.bottom.equalTo(view.safeAreaLayoutGuide).offset(-32)
+            make.bottom.equalTo(restorePurchasesButton.snp.top)
             make.height.equalTo(62)
+        }
+        
+        restorePurchasesButton.snp.makeConstraints { make in
+            make.centerX.equalToSuperview()
+            make.height.equalTo(40)
+            make.bottom.equalTo(view.safeAreaLayoutGuide)
         }
         
         gradientView.snp.makeConstraints { make in
@@ -141,20 +152,59 @@ class PaywallViewController: UIViewController {
             make.left.equalTo(backgroundImageView)
             make.right.equalTo(backgroundImageView)
         }
+        
+        closeButton.snp.makeConstraints { make in
+            make.height.width.equalTo(40)
+            make.top.right.equalTo(view.safeAreaLayoutGuide)
+        }
     }
     
-    @objc func didSelectedUpperButton(_ sender: UIButton) {
-        lowerButton.isSelected = false
-        viewModel.didSelectedUpperButton()
+    func bindViewModel() {
+        viewModel.input.productsDriver
+            .drive(onNext: { [weak self] products in
+                self?.setProfuctsButtons(products: products)
+            })
+            .disposed(by: disposeBag)
     }
     
-    @objc func didSelectedLowerButton(_ sender: UIButton) {
-        upperButton.isSelected = false
-        viewModel.didSelectedLowerButton()
+    func setProfuctsButtons(products: [PaywallProductModel]) {
+        products.forEach { product in
+            let button = SelectableOptionButton(leftTitle: product.name, leftSubtitle: product.description, rightTitle: product.price, rightSubtitle: product.paymentPeriod)
+            button.addTarget(self, action: #selector(didSelectedOptionButton(_:)), for: .valueChanged)
+            optionButtonsStack.addArrangedSubview(button)
+            
+            button.snp.makeConstraints { make in
+                make.height.equalTo(66)
+            }
+        }
+        
+        guard let firstButton = optionButtonsStack.arrangedSubviews.first as? SelectableOptionButton else { return }
+        firstButton.isSelected = true
+    }
+    
+    @objc func didSelectedOptionButton(_ sender: UIButton) {
+        guard let optionButton = sender as? SelectableOptionButton,
+              let buttonIndex = optionButtonsStack.arrangedSubviews.firstIndex(where: { $0 == optionButton }) else { return }
+        
+        optionButtonsStack.arrangedSubviews.forEach { button in
+            guard let button = button as? SelectableOptionButton else { return }
+            if button == optionButton { return }
+            button.isSelected = false
+        }
+        
+        viewModel.output.didSelectSubscriptionPlan.accept(buttonIndex)
     }
     
     @objc func didTappedSubscribeButton() {
-        viewModel.didTappedSubscribeButton()
+        viewModel.output.didTapSubscribe.accept(())
+    }
+    
+    @objc func didTappedRestorePurchasesButton() {
+        viewModel.output.didTapRestorePurchases.accept(())
+    }
+    
+    @objc func didTappedCloseButton() {
+        viewModel.output.didTapClose.accept(())
     }
     
     func getDescriptionView(text: String) -> UIView {

@@ -8,6 +8,8 @@
 import Foundation
 import UIKit
 import RxSwift
+import SwiftHelper
+import ApphudSDK
 
 final class AppCoordinator: CoordinatorProtocol {
     let window: UIWindow
@@ -26,6 +28,11 @@ final class AppCoordinator: CoordinatorProtocol {
     }
     
     func start() {
+        Apphud.enableDebugLogs()
+        DispatchQueue.main.async {
+            Apphud.start(apiKey: "app_NRNkc8FMVUrccB1iUNjzNQAA3rZaAQ")
+        }
+        
         // TODO: change storageService.hasCompletedOnboarding
         if !storageService.hasCompletedOnboarding {
             goToOnBoarding()
@@ -52,18 +59,6 @@ final class AppCoordinator: CoordinatorProtocol {
             self.childDidFinished(child: coordinator)
             
         }).disposed(by: disposeBag)
-    }
-    
-    func goToExploreTemplates(shouldShowPaywall: Bool = false) {
-        let coordinator = ExploreTemplatesCoordinator(apiService: apiService, storageService: storageService)
-        coordinator.start()
-        if shouldShowPaywall {
-            coordinator.showPaywall()
-        }
-        childCoordinators.append(coordinator)
-        
-        window.rootViewController = coordinator.navigationController
-        window.makeKeyAndVisible()
     }
     
     func goToTabBar(showPaywall: Bool = false) {

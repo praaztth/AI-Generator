@@ -11,7 +11,7 @@ import RxSwift
 import RxCocoa
 import RxDataSources
 
-class ExploreStylesViewController: UIViewController {
+class ExploreStylesViewController: UIViewController, ViewControllerConfigurable {
     let collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.itemSize = CGSize(width: 170, height: 236)
@@ -26,7 +26,6 @@ class ExploreStylesViewController: UIViewController {
         return view
     }()
     
-//    private let customView = ExploreTemplatesView()
     private let viewModel: ExploreStylesViewModelToView
     private let disposeBag = DisposeBag()
     

@@ -63,14 +63,15 @@ class TabBarCoordinator: CoordinatorProtocol {
     }
     
     func showPayWall() {
-        let coordinator = PaywallCoordinator()
+        let navigationController = UINavigationController()
+        let coordinator = PaywallCoordinator(navigationController: navigationController)
         coordinator.start()
         childCoordinators.append(coordinator)
         
-        tabBarController.present(coordinator.viewController!, animated: true)
+        tabBarController.present(navigationController, animated: true)
         
         coordinator.didFinish.subscribe(onNext: {
-            coordinator.viewController?.dismiss(animated: true)
+            self.tabBarController.dismiss(animated: true)
             self.childDidFinished(child: coordinator)
         }).disposed(by: disposeBag)
     }

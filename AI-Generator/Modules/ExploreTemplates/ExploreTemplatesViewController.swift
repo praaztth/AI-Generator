@@ -9,6 +9,8 @@ import UIKit
 import RxSwift
 import RxCocoa
 import RxDataSources
+import SwiftHelper
+import ApphudSDK
 
 protocol ExploreTemplatesViewControllerOutput {
     var sectionsDriver: Driver<[SectionOfTemplates]> { get }
@@ -42,6 +44,14 @@ class ExploreTemplatesViewController: UIViewController {
         bindViewModel()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        Apphud.restorePurchases { _, _, _ in
+            self.updateProButton()
+        }
+    }
+    
     func bindViewModel() {
         let dataSource = configureDataSource()
         
@@ -57,14 +67,20 @@ class ExploreTemplatesViewController: UIViewController {
             .disposed(by: disposeBag)
     }
     
+    func updateProButton() {
+        if !SwiftHelper.apphudHelper.isProUser() {
+            let imageBarButton = UIImage(systemName: "sparkles")
+            let barButton = BarButton(title: "PRO", backgroundColor: .appBlue, image: imageBarButton)
+            barButton.addTarget(self, action: #selector(openPaywallButtonTapped), for: .touchUpInside)
+            navigationItem.rightBarButtonItem = UIBarButtonItem(customView: barButton)
+        } else {
+            navigationItem.rightBarButtonItem = nil
+        }
+    }
+    
     func configureNavBar() {
         navigationController?.configureNavigationBar()
-        
         navigationItem.title = "Templates"
-        let imageBarButton = UIImage(systemName: "sparkles")
-        let barButton = BarButton(title: "PRO", backgroundColor: .appBlue, image: imageBarButton)
-        barButton.addTarget(self, action: #selector(openPaywallButtonTapped), for: .touchUpInside)
-        navigationItem.rightBarButtonItem = UIBarButtonItem(customView: barButton)
     }
     
     @objc func openPaywallButtonTapped() {
