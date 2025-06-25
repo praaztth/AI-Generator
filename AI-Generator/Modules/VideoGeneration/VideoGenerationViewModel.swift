@@ -40,10 +40,10 @@ class VideoGenerationViewModel: ViewModelConfigurable, VideoGenerationViewModelI
     }
     
     init(apiService: PixVerseAPIServiceProtocol, storageService: UserDefaultsServiceProtocol, generateBy: GenerateBy) {
-//        self.apiService = apiService
-//        self.storageService = storageService
-        self.apiService = MockApiService()
-        self.storageService = MockStorageService()
+        self.apiService = apiService
+        self.storageService = storageService
+//        self.apiService = MockApiService()
+//        self.storageService = MockStorageService()
         
         switch generateBy {
         case .imageTemplate(let imageData, let imageName, let templateID):

@@ -28,7 +28,7 @@ final class AppCoordinator: CoordinatorProtocol {
     }
     
     func start() {
-        Apphud.enableDebugLogs()
+//        Apphud.enableDebugLogs()
         DispatchQueue.main.async {
             Apphud.start(apiKey: "app_NRNkc8FMVUrccB1iUNjzNQAA3rZaAQ")
         }

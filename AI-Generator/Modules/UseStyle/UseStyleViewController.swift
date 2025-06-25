@@ -9,7 +9,6 @@ import UIKit
 import GSPlayer
 import RxSwift
 import RxCocoa
-import GSPlayer
 import PhotosUI
 
 class UseStyleViewController: UIViewController {

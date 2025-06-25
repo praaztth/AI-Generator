@@ -42,7 +42,10 @@ class ProfileViewController: UIViewController, ViewControllerConfigurable {
         setupUI()
         setupConstraints()
         bindViewModel()
-        
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
         viewModel.output.loadTrigger.accept(())
     }
     
@@ -93,6 +96,6 @@ class ProfileViewController: UIViewController, ViewControllerConfigurable {
     }
     
     @objc func openSettingsTapped() {
-        
+        viewModel.output.didTapSettings.accept(())
     }
 }

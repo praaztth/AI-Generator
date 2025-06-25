@@ -7,6 +7,7 @@
 
 import Foundation
 import RxSwift
+import RxCocoa
 
 class ProfileCoordinator: CoordinatorProtocol {
     private let disposeBag = DisposeBag()
@@ -18,6 +19,11 @@ class ProfileCoordinator: CoordinatorProtocol {
     let storageService: UserDefaultsServiceProtocol
     var navigationController: UINavigationController
     
+    private let _shouldOpenPaywall = PublishRelay<Void>()
+    var shouldOpenPaywall: Driver<Void> {
+        _shouldOpenPaywall.asDriver(onErrorJustReturn: ())
+    }
+    
     init(apiService: PixVerseAPIServiceProtocol, storageService: UserDefaultsServiceProtocol, navigationController: UINavigationController) {
         self.apiService = apiService
         self.storageService = storageService
@@ -28,6 +34,32 @@ class ProfileCoordinator: CoordinatorProtocol {
         let viewModel = ProfileViewModel(apiService: apiService, storageService: storageService)
         let viewController = ProfileViewController(viewModel: viewModel)
         navigationController.viewControllers = [viewController]
+        
+        let viewModelOutput = viewModel as ProfileViewModelToCoordinator
+        
+        viewModelOutput.shouldOpenSettings
+            .drive(onNext: {
+                self.goToSettings()
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    func goToSettings() {
+        let coordinator = SettingsCoordinator(storageService: storageService, navigationController: navigationController)
+        coordinator.start()
+        childCoordinators.append(coordinator)
+        
+        coordinator.shouldOpenPaywall
+            .subscribe(onNext: {
+                self._shouldOpenPaywall.accept(())
+            })
+            .disposed(by: disposeBag)
+        
+        coordinator.didFinish
+            .subscribe(onNext: { [weak self] in
+                self?.childDidFinished(child: coordinator)
+            })
+            .disposed(by: disposeBag)
     }
     
     func finish() {

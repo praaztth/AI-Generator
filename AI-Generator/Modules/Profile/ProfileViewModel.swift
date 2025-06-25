@@ -16,6 +16,7 @@ protocol ProfileViewModelInputs {
 
 protocol ProfileViewModelOutputs {
     var loadTrigger: PublishRelay<Void> { get }
+    var didTapSettings: PublishRelay<Void> { get }
 }
 
 protocol ProfileViewModelToView {
@@ -24,7 +25,7 @@ protocol ProfileViewModelToView {
 }
 
 protocol ProfileViewModelToCoordinator {
-    
+    var shouldOpenSettings: Driver<Void> { get }
 }
 
 class ProfileViewModel: ViewModelConfigurable, ProfileViewModelInputs, ProfileViewModelOutputs, ProfileViewModelToView, ProfileViewModelToCoordinator {
@@ -36,7 +37,7 @@ class ProfileViewModel: ViewModelConfigurable, ProfileViewModelInputs, ProfileVi
     var output: ProfileViewModelOutputs { self }
     
     // ViewController Inputs
-    private let _sectionedVideos = PublishRelay<[SectionOfVideos]>()
+    private var _sectionedVideos = PublishSubject<[SectionOfVideos]>()
     var sectionedVideosDriver: Driver<[SectionOfVideos]> {
         _sectionedVideos
             .asDriver(onErrorJustReturn: [])
@@ -44,8 +45,13 @@ class ProfileViewModel: ViewModelConfigurable, ProfileViewModelInputs, ProfileVi
     
     // ViewController Outputs
     var loadTrigger = PublishRelay<Void>()
+    var didTapSettings = PublishRelay<Void>()
     
     // Coordinator Inputs
+    private let _shouldOpenSettings = PublishRelay<Void>()
+    var shouldOpenSettings: Driver<Void> {
+        _shouldOpenSettings.asDriver(onErrorJustReturn: ())
+    }
     
     init(apiService: PixVerseAPIServiceProtocol, storageService: UserDefaultsServiceProtocol) {
         self.apiService = apiService
@@ -55,48 +61,60 @@ class ProfileViewModel: ViewModelConfigurable, ProfileViewModelInputs, ProfileVi
     }
     
     func setupBindings() {
-        loadTrigger.subscribe(onNext: {
-            self.loadGeneratedVideos()
-        })
-        .disposed(by: disposeBag)
+        loadTrigger
+            .subscribe(onNext: {
+                self.loadGeneratedVideos()
+            })
+            .disposed(by: disposeBag)
+        
+        didTapSettings
+            .bind(to: _shouldOpenSettings)
+            .disposed(by: disposeBag)
     }
     
     func loadGeneratedVideos() {
         let generatedVideos = storageService.getAllGeneratedVideos()
-        
-        let videoCellModels = generatedVideos
-            .compactMap { video -> GeneratedVideoCellModel? in
-                guard let stringUrl = video.video_url,
-                      let url = URL(string: stringUrl) else { return nil }
-                return GeneratedVideoCellModel(previewImage: UIImage(), videoURL: url)
+        let thumbnailSingles: [Single<GeneratedVideoCellModel>] = generatedVideos
+            .compactMap { video -> Single<GeneratedVideoCellModel>? in
+                guard let stringURL = video.video_url,
+                      let url = URL(string: stringURL) else { return nil }
+                return generateThumbnail(from: url)
             }
         
-        _sectionedVideos.accept([SectionOfVideos(items: videoCellModels)])
+        Single.zip(thumbnailSingles)
+            .subscribe(onSuccess: { [weak self] elements in
+                self?._sectionedVideos.onNext([SectionOfVideos(items: elements)])
+            }, onFailure: { error in
+                print(error)
+            })
+            .disposed(by: disposeBag)
     }
     
-    // TODO: use rx
-    func generateThumbnail(from url: URL, completion: @escaping (UIImage?) -> Void) {
-        let asset = AVURLAsset(url: url)
-        let imageGenerator = AVAssetImageGenerator(asset: asset)
-        imageGenerator.appliesPreferredTrackTransform = true
-        
-        let time = CMTime(seconds: 1, preferredTimescale: 600)
-        
-        imageGenerator.generateCGImageAsynchronously(for: time) { cgImage, _, error in
-            if let error = error {
-                print("Error generating thumbnail: \(error)")
-                completion(nil)
-                return
+    func generateThumbnail(from url: URL) -> Single<GeneratedVideoCellModel> {
+        return Single.create { single in
+            let asset = AVURLAsset(url: url)
+            let imageGenerator = AVAssetImageGenerator(asset: asset)
+            imageGenerator.appliesPreferredTrackTransform = true
+            
+            let time = CMTime(seconds: 1, preferredTimescale: 600)
+            
+            imageGenerator.generateCGImageAsynchronously(for: time) { cgImage, _, error in
+                if let error = error {
+                    single(.failure(NSError(domain: "Error generating thumbnail: \(error.localizedDescription)", code: -1)))
+                    return
+                }
+                
+                guard let cgImage = cgImage else {
+                    single(.failure(NSError(domain: "Empty cgImage after generation thumbnail", code: -1)))
+                    return
+                }
+                
+                let image = UIImage(cgImage: cgImage)
+                let model = GeneratedVideoCellModel(previewImage: image, videoURL: url)
+                single(.success(model))
             }
             
-            guard let cgImage = cgImage else {
-                print("Empty cgImage after generation thumbnail")
-                completion(nil)
-                return
-            }
-            
-            let image = UIImage(cgImage: cgImage)
-            completion(image)
+            return Disposables.create {}
         }
     }
 }

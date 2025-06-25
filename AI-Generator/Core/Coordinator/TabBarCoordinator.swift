@@ -41,7 +41,7 @@ class TabBarCoordinator: CoordinatorProtocol {
         let usePromptViewController = usePromptCoordinator.navigationController
         let profileViewController = profileCoordinator.navigationController
         
-        templatesExploreViewController.tabBarItem = UITabBarItem(title: "Templates", image: UIImage(systemName: "play.rectangle.on.rectangle.fill"), tag: 0)
+        templatesExploreViewController.tabBarItem = UITabBarItem(title: "Templates", image: UIImage(systemName: "photo.fill.on.rectangle.fill"), tag: 0)
         stylesExploreViewController.tabBarItem = UITabBarItem(title: "Styles", image: UIImage(systemName: "play.rectangle.on.rectangle.fill"), tag: 1)
         usePromptViewController.tabBarItem = UITabBarItem(title: "AI Promt", image: UIImage(systemName: "sparkles"), tag: 2)
         profileViewController.tabBarItem = UITabBarItem(title: "Profile", image: UIImage(systemName: "person.fill"), tag: 3)
@@ -62,6 +62,12 @@ class TabBarCoordinator: CoordinatorProtocol {
             .disposed(by: disposeBag)
         
         stylesExploreCoordinator.shouldOpenPaywall
+            .drive(onNext: {
+                self.showPayWall()
+            })
+            .disposed(by: disposeBag)
+        
+        profileCoordinator.shouldOpenPaywall
             .drive(onNext: {
                 self.showPayWall()
             })
