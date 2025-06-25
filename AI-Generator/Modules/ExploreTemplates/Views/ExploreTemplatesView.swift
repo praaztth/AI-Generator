@@ -37,7 +37,7 @@ class ExploreTemplatesView: UIView {
     
     func setupConstraints() {
         collectionView.snp.makeConstraints { make in
-            make.top.bottom.left.right.equalToSuperview()
+            make.top.bottom.left.right.equalTo(safeAreaLayoutGuide)
         }
     }
     

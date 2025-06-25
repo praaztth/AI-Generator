@@ -86,11 +86,12 @@ class ExploreTemplatesViewController: UIViewController {
     
     func configureDataSource() -> RxCollectionViewSectionedReloadDataSource<SectionOfTemplates> {
         return RxCollectionViewSectionedReloadDataSource<SectionOfTemplates> { dataSource, collectionView, indexPath, item in
-            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ExploreTemplatesCollectionCell.reuseIdentifier, for: indexPath) as? ExploreTemplatesCollectionCell else {
+            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ExploreTemplatesCollectionCell.reuseIdentifier, for: indexPath) as? ExploreTemplatesCollectionCell,
+                  let url = URL(string: item.preview_small) else {
                 return UICollectionViewCell(frame: .zero)
             }
             
-            cell.configure(name: item.name)
+            cell.configure(name: item.name, url: url)
             return cell
             
         } configureSupplementaryView: { dataSource, collectionView, kind, indexPath in
