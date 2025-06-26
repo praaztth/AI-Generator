@@ -27,7 +27,9 @@ protocol PaywallViewModelOutputs {
     var viewDidAppear: PublishRelay<Void> { get }
     var didSelectSubscriptionPlan: PublishRelay<Int> { get }
     var didTapSubscribe: PublishRelay<Void> { get }
+    var didTapTerms: PublishRelay<Void> { get }
     var didTapRestorePurchases: PublishRelay<Void> { get }
+    var didTapPrivacy: PublishRelay<Void> { get }
     var didTapClose: PublishRelay<Void> { get }
 }
 
@@ -36,13 +38,13 @@ protocol PaywallViewModelToView {
     var output: PaywallViewModelOutputs { get }
 }
 
-protocol PaywallViewModelToCoordinator {
+protocol PaywallViewModelToCoordinator: ViewModelToCoordinator {
     var successfullySubscribed: Driver<Void> { get }
     var unsuccessfullySubscribed: Driver<Void> { get }
     var shouldCloseViewDriver: Driver<Void> { get }
 }
 
-class PaywallViewModel: ViewModelConfigurable, PaywallViewModelInputs, PaywallViewModelOutputs, PaywallViewModelToView, PaywallViewModelToCoordinator {
+class PaywallViewModel: BaseViewModel, PaywallViewModelInputs, PaywallViewModelOutputs, PaywallViewModelToView, PaywallViewModelToCoordinator {
     private var products: [ApphudProduct] = []
     private var selectedProductIndex = 0
     private let disposeBag = DisposeBag()
@@ -67,7 +69,9 @@ class PaywallViewModel: ViewModelConfigurable, PaywallViewModelInputs, PaywallVi
     var viewDidAppear = PublishRelay<Void>()
     var didSelectSubscriptionPlan = PublishRelay<Int>()
     var didTapSubscribe = PublishRelay<Void>()
+    var didTapTerms = PublishRelay<Void>()
     var didTapRestorePurchases = PublishRelay<Void>()
+    var didTapPrivacy = PublishRelay<Void>()
     var didTapClose = PublishRelay<Void>()
     
     // Coordinator Inputs
@@ -86,11 +90,7 @@ class PaywallViewModel: ViewModelConfigurable, PaywallViewModelInputs, PaywallVi
         _shouldCloseView.asDriver(onErrorJustReturn: ())
     }
     
-    init() {
-        setupBindings()
-    }
-    
-    func setupBindings() {
+    override func setupBindings() {
         viewDidLoad
             .subscribe(onNext: {
                 self.getProducts()
@@ -123,6 +123,20 @@ class PaywallViewModel: ViewModelConfigurable, PaywallViewModelInputs, PaywallVi
         didTapSubscribe
             .subscribe(onNext: {
                 self.purchaseSubscription()
+            })
+            .disposed(by: disposeBag)
+        
+        didTapTerms
+            .subscribe(onNext: {
+                guard let url = URL(string: Constants.termsOfUseURL) else { return }
+                self._shouldOpenLink.accept(url)
+            })
+            .disposed(by: disposeBag)
+        
+        didTapPrivacy
+            .subscribe(onNext: {
+                guard let url = URL(string: Constants.privacyPolicyURL) else { return }
+                self._shouldOpenLink.accept(url)
             })
             .disposed(by: disposeBag)
         

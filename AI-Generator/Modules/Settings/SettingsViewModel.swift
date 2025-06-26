@@ -60,14 +60,9 @@ class SettingsViewModel: BaseViewModel, SettingsViewModelInputs, SettingsViewMod
         _shouldOpenPaywall.asObservable()
     }
     
-    private let _shouldOpenLink = PublishRelay<URL>()
-    var shouldOpenLink: Driver<URL> {
-        _shouldOpenLink.asDriver(onErrorJustReturn: URL(string: "https://example.com")!)
-    }
-    
-//    private let _shouldShowLoading = PublishRelay<Bool>()
-//    var shouldShowLoading: Driver<Bool> {
-//        _shouldShowLoading.asDriver(onErrorJustReturn: false)
+//    private let _shouldOpenLink = PublishRelay<URL>()
+//    var shouldOpenLink: Driver<URL> {
+//        _shouldOpenLink.asDriver(onErrorJustReturn: URL(string: "https://example.com")!)
 //    }
     
     init(storageService: UserDefaultsServiceProtocol) {
@@ -94,11 +89,11 @@ class SettingsViewModel: BaseViewModel, SettingsViewModelInputs, SettingsViewMod
             self.requestReview()
             
         case .privacy:
-            guard let url = URL(string: "https://docs.google.com/document/d/1SXO9Nxq_tqP4KulDGQG3N5GuPe6Kb8RhweecGfHVbQM/edit?tab=t.0") else { return }
+            guard let url = URL(string: Constants.privacyPolicyURL) else { return }
             _shouldOpenLink.accept(url)
             
         case .terms:
-            guard let url = URL(string: "https://docs.google.com/document/d/1O3CZ9Nv7UpGiRnHe_tQZy5TbLbW7BfkvTih-Yb81vWY/edit?tab=t.0") else { return }
+            guard let url = URL(string: Constants.termsOfUseURL) else { return }
             _shouldOpenLink.accept(url)
             
         case .support:

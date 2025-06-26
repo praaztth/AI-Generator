@@ -41,6 +41,11 @@ class PaywallCoordinator: BaseCoordinator {
                 self.finish()
             })
             .disposed(by: disposedBag)
+        viewModelInput.shouldOpenLink
+            .drive(onNext: { url in
+                self.openLink(url: url)
+            })
+            .disposed(by: disposedBag)
     }
     
 //    func showAlert(message: String) {

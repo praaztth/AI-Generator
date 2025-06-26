@@ -42,8 +42,9 @@ class SettingsCoordinator: BaseCoordinator {
         
         viewModelInput.shouldOpenLink
             .drive(onNext: { url in
-                let safaryVC = SFSafariViewController(url: url)
-                self.navigationController.present(safaryVC, animated: true)
+                self.openLink(url: url)
+//                let safaryVC = SFSafariViewController(url: url)
+//                self.navigationController.present(safaryVC, animated: true)
             })
             .disposed(by: disposeBag)
         

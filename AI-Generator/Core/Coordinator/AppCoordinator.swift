@@ -14,12 +14,8 @@ import ApphudSDK
 final class AppCoordinator: BaseCoordinator {
     let window: UIWindow
     
-//    var childCoordinators: [CoordinatorProtocol] = []
     let apiService: PixVerseAPIServiceProtocol
     var storageService: UserDefaultsServiceProtocol
-    
-//    var didFinish = PublishSubject<Void>()
-//    let disposeBag = DisposeBag()
     
     init(apiService: PixVerseAPIServiceProtocol, storageService: UserDefaultsServiceProtocol, window: UIWindow) {
         self.apiService = apiService

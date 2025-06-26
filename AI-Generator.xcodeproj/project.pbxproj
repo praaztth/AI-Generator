@@ -18,6 +18,7 @@
 		8048A5E42E0D71F800216B82 /* GSPlayer in Frameworks */ = {isa = PBXBuildFile; productRef = 8048A5E32E0D71F800216B82 /* GSPlayer */; };
 		8048A5E62E0D720000216B82 /* GSPlayer in Frameworks */ = {isa = PBXBuildFile; productRef = 8048A5E52E0D720000216B82 /* GSPlayer */; };
 		80694A302E04D7A1004D83CF /* SwiftHelper in Frameworks */ = {isa = PBXBuildFile; productRef = 80694A2F2E04D7A1004D83CF /* SwiftHelper */; };
+		80A8C2BC2E0D8FCC00EEF5AC /* LocalStoreKit.storekit in Resources */ = {isa = PBXBuildFile; fileRef = 80A8C2BB2E0D8FCC00EEF5AC /* LocalStoreKit.storekit */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -37,6 +38,7 @@
 		3F8FAF8604A91C99E9464A8A /* Pods-AI-Generator.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AI-Generator.release.xcconfig"; path = "Target Support Files/Pods-AI-Generator/Pods-AI-Generator.release.xcconfig"; sourceTree = "<group>"; };
 		73EECFDCE3DBFB0B104002FC /* Pods_AI_Generator.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AI_Generator.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		80472F0E2E0188410098B744 /* AI-Generator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "AI-Generator.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		80A8C2BB2E0D8FCC00EEF5AC /* LocalStoreKit.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = LocalStoreKit.storekit; sourceTree = "<group>"; };
 		AAD76DD66F9C8800CFCFF106 /* Pods-AI-Generator.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AI-Generator.debug.xcconfig"; path = "Target Support Files/Pods-AI-Generator/Pods-AI-Generator.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -107,6 +109,7 @@
 				80472F0F2E0188410098B744 /* Products */,
 				1373C87981A5FF0ABDC8849D /* Pods */,
 				7809FB1D40D5B3B1F99D406D /* Frameworks */,
+				80A8C2BB2E0D8FCC00EEF5AC /* LocalStoreKit.storekit */,
 			);
 			sourceTree = "<group>";
 		};
@@ -187,6 +190,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				80A8C2BC2E0D8FCC00EEF5AC /* LocalStoreKit.storekit in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -7,6 +7,7 @@
 
 import UIKit
 import RxSwift
+import SafariServices
 
 class BaseCoordinator {
     var childCoordinators: [BaseCoordinator] = []
@@ -41,6 +42,11 @@ class BaseCoordinator {
         } else {
             vc.dismiss(animated: true)
         }
+    }
+    
+    func openLink(url: URL) {
+        let safaryVC = SFSafariViewController(url: url)
+        self.navigationController.present(safaryVC, animated: true)
     }
     
     func childDidFinished(child: BaseCoordinator) {

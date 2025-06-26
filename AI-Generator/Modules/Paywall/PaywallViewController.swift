@@ -42,7 +42,9 @@ class PaywallViewController: UIViewController, ViewControllerConfigurable {
         return stack
     }()
     
+    let termsOfUseButton = SwiftHelper.uiHelper.customAnimateButton(bgColor: .clear, bgImage: nil, title: "Terms of Use", titleColor: .appGrey, fontTitleColor: .systemFont(ofSize: 12), cornerRadius: nil, borderWidth: nil, borderColor: nil)
     let restorePurchasesButton = SwiftHelper.uiHelper.customAnimateButton(bgColor: .clear, bgImage: nil, title: "Restore Purchases", titleColor: .appGrey, fontTitleColor: .systemFont(ofSize: 12), cornerRadius: nil, borderWidth: nil, borderColor: nil)
+    let privacyPolicyButton = SwiftHelper.uiHelper.customAnimateButton(bgColor: .clear, bgImage: nil, title: "Privacy Policy", titleColor: .appGrey, fontTitleColor: .systemFont(ofSize: 12), cornerRadius: nil, borderWidth: nil, borderColor: nil)
     
     let closeButton: UIButton = {
         var config = UIButton.Configuration.plain()
@@ -113,11 +115,15 @@ class PaywallViewController: UIViewController, ViewControllerConfigurable {
         
         subscribeButton.setTitle("Subscribe", for: .normal)
         subscribeButton.addTarget(self, action: #selector(didTappedSubscribeButton), for: .touchUpInside)
+        termsOfUseButton.addTarget(self, action: #selector(didTappedTermsButton), for: .touchUpInside)
         restorePurchasesButton.addTarget(self, action: #selector(didTappedRestorePurchasesButton), for: .touchUpInside)
+        privacyPolicyButton.addTarget(self, action: #selector(didTappedPrivacyButton), for: .touchUpInside)
         closeButton.addTarget(self, action: #selector(didTappedCloseButton), for: .touchUpInside)
         
         view.addSubview(subscribeButton)
+        view.addSubview(termsOfUseButton)
         view.addSubview(restorePurchasesButton)
+        view.addSubview(privacyPolicyButton)
         view.addSubview(closeButton)
     }
     
@@ -152,10 +158,24 @@ class PaywallViewController: UIViewController, ViewControllerConfigurable {
             make.height.equalTo(62)
         }
         
+        termsOfUseButton.snp.makeConstraints { make in
+            make.left.equalTo(view.safeAreaLayoutGuide)
+            make.right.equalTo(restorePurchasesButton.snp.left)
+            make.bottom.equalTo(view.safeAreaLayoutGuide)
+            make.height.equalTo(40)
+        }
+        
         restorePurchasesButton.snp.makeConstraints { make in
             make.centerX.equalToSuperview()
             make.height.equalTo(40)
             make.bottom.equalTo(view.safeAreaLayoutGuide)
+        }
+        
+        privacyPolicyButton.snp.makeConstraints { make in
+            make.right.equalTo(view.safeAreaLayoutGuide)
+            make.left.equalTo(restorePurchasesButton.snp.right)
+            make.bottom.equalTo(view.safeAreaLayoutGuide)
+            make.height.equalTo(40)
         }
         
         gradientView.snp.makeConstraints { make in
@@ -221,8 +241,16 @@ class PaywallViewController: UIViewController, ViewControllerConfigurable {
         viewModel.output.didTapSubscribe.accept(())
     }
     
+    @objc func didTappedTermsButton() {
+        viewModel.output.didTapTerms.accept(())
+    }
+    
     @objc func didTappedRestorePurchasesButton() {
         viewModel.output.didTapRestorePurchases.accept(())
+    }
+    
+    @objc func didTappedPrivacyButton() {
+        viewModel.output.didTapPrivacy.accept(())
     }
     
     @objc func didTappedCloseButton() {
