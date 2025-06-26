@@ -73,7 +73,19 @@ class PaywallViewController: UIViewController, ViewControllerConfigurable {
         setupConstraints()
         bindViewModel()
         
-        viewModel.output.loadTrigger.accept(())
+        viewModel.output.viewDidLoad.accept(())
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        viewModel.output.viewWillAppear.accept(())
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        viewModel.output.viewDidAppear.accept(())
     }
     
     func setupUI() {
@@ -165,6 +177,12 @@ class PaywallViewController: UIViewController, ViewControllerConfigurable {
                 self?.setProfuctsButtons(products: products)
             })
             .disposed(by: disposeBag)
+        
+        viewModel.input.displayCloseDriver
+            .drive(onNext: { [weak self] needToDisplay in
+                self?.closeButton.isHidden = !needToDisplay
+            })
+            .disposed(by: disposeBag)
     }
     
     func setProfuctsButtons(products: [PaywallProductModel]) {
@@ -180,6 +198,10 @@ class PaywallViewController: UIViewController, ViewControllerConfigurable {
         
         guard let firstButton = optionButtonsStack.arrangedSubviews.first as? SelectableOptionButton else { return }
         firstButton.isSelected = true
+    }
+    
+    func showCloseButton() {
+        
     }
     
     @objc func didSelectedOptionButton(_ sender: UIButton) {

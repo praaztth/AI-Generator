@@ -201,7 +201,11 @@ class MockStorageService: UserDefaultsServiceProtocol {
     }
     
     func getAllRequests() -> [GenerationRequest] {
-        []
+        [
+            GenerationRequest(video_id: 1, detail: "Hello World"),
+            GenerationRequest(video_id: 2, detail: "Swift"),
+            GenerationRequest(video_id: 2, detail: "Swift")
+        ]
     }
     
     func getAllGeneratedVideos() -> [GeneratedVideo] {

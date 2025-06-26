@@ -18,10 +18,13 @@ enum SubscriptionPlan {
 
 protocol PaywallViewModelInputs {
     var productsDriver: Driver<[PaywallProductModel]> { get }
+    var displayCloseDriver: Driver<Bool> { get }
 }
 
 protocol PaywallViewModelOutputs {
-    var loadTrigger: PublishRelay<Void> { get }
+    var viewDidLoad: PublishRelay<Void> { get }
+    var viewWillAppear: PublishRelay<Void> { get }
+    var viewDidAppear: PublishRelay<Void> { get }
     var didSelectSubscriptionPlan: PublishRelay<Int> { get }
     var didTapSubscribe: PublishRelay<Void> { get }
     var didTapRestorePurchases: PublishRelay<Void> { get }
@@ -53,8 +56,15 @@ class PaywallViewModel: ViewModelConfigurable, PaywallViewModelInputs, PaywallVi
         _productsToDisplay.asDriver(onErrorJustReturn: [])
     }
     
+    private let _displayCloseDriver = PublishRelay<Bool>()
+    var displayCloseDriver: Driver<Bool> {
+        _displayCloseDriver.asDriver(onErrorJustReturn: false)
+    }
+    
     // ViewController Outputs
-    var loadTrigger = PublishRelay<Void>()
+    var viewDidLoad = PublishRelay<Void>()
+    var viewWillAppear = PublishRelay<Void>()
+    var viewDidAppear = PublishRelay<Void>()
     var didSelectSubscriptionPlan = PublishRelay<Int>()
     var didTapSubscribe = PublishRelay<Void>()
     var didTapRestorePurchases = PublishRelay<Void>()
@@ -81,9 +91,25 @@ class PaywallViewModel: ViewModelConfigurable, PaywallViewModelInputs, PaywallVi
     }
     
     func setupBindings() {
-        loadTrigger
+        viewDidLoad
             .subscribe(onNext: {
                 self.getProducts()
+            })
+            .disposed(by: disposeBag)
+        
+        viewWillAppear
+            .subscribe(onNext: {
+                self._displayCloseDriver.accept(false)
+            })
+            .disposed(by: disposeBag)
+        
+        viewDidAppear
+            .flatMapLatest { _ in
+                Observable<Int>.timer(.seconds(2), scheduler: MainScheduler.instance)
+                    .map { _ in () }
+            }
+            .subscribe(onNext: { [weak self] in
+                self?._displayCloseDriver.accept(true)
             })
             .disposed(by: disposeBag)
         
