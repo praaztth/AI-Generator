@@ -7,9 +7,31 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8048A5C02E0D712800216B82 /* RxBlocking in Frameworks */ = {isa = PBXBuildFile; productRef = 8048A5BF2E0D712800216B82 /* RxBlocking */; };
+		8048A5C52E0D712800216B82 /* RxCocoa in Frameworks */ = {isa = PBXBuildFile; productRef = 8048A5C42E0D712800216B82 /* RxCocoa */; };
+		8048A5CA2E0D712800216B82 /* RxRelay in Frameworks */ = {isa = PBXBuildFile; productRef = 8048A5C92E0D712800216B82 /* RxRelay */; };
+		8048A5CF2E0D712800216B82 /* RxSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 8048A5CE2E0D712800216B82 /* RxSwift */; };
+		8048A5DB2E0D719000216B82 /* Differentiator in Frameworks */ = {isa = PBXBuildFile; productRef = 8048A5DA2E0D719000216B82 /* Differentiator */; };
+		8048A5DD2E0D719000216B82 /* RxDataSources in Frameworks */ = {isa = PBXBuildFile; productRef = 8048A5DC2E0D719000216B82 /* RxDataSources */; };
+		8048A5DF2E0D719700216B82 /* Differentiator in Frameworks */ = {isa = PBXBuildFile; productRef = 8048A5DE2E0D719700216B82 /* Differentiator */; };
+		8048A5E12E0D719700216B82 /* RxDataSources in Frameworks */ = {isa = PBXBuildFile; productRef = 8048A5E02E0D719700216B82 /* RxDataSources */; };
+		8048A5E42E0D71F800216B82 /* GSPlayer in Frameworks */ = {isa = PBXBuildFile; productRef = 8048A5E32E0D71F800216B82 /* GSPlayer */; };
+		8048A5E62E0D720000216B82 /* GSPlayer in Frameworks */ = {isa = PBXBuildFile; productRef = 8048A5E52E0D720000216B82 /* GSPlayer */; };
 		80694A302E04D7A1004D83CF /* SwiftHelper in Frameworks */ = {isa = PBXBuildFile; productRef = 80694A2F2E04D7A1004D83CF /* SwiftHelper */; };
-		C44F33C7B91AA2C39DE89817 /* Pods_AI_Generator.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 73EECFDCE3DBFB0B104002FC /* Pods_AI_Generator.framework */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		8048A5D82E0D712800216B82 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		3F8FAF8604A91C99E9464A8A /* Pods-AI-Generator.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AI-Generator.release.xcconfig"; path = "Target Support Files/Pods-AI-Generator/Pods-AI-Generator.release.xcconfig"; sourceTree = "<group>"; };
@@ -44,8 +66,17 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8048A5CF2E0D712800216B82 /* RxSwift in Frameworks */,
+				8048A5DF2E0D719700216B82 /* Differentiator in Frameworks */,
+				8048A5DB2E0D719000216B82 /* Differentiator in Frameworks */,
 				80694A302E04D7A1004D83CF /* SwiftHelper in Frameworks */,
-				C44F33C7B91AA2C39DE89817 /* Pods_AI_Generator.framework in Frameworks */,
+				8048A5E42E0D71F800216B82 /* GSPlayer in Frameworks */,
+				8048A5E12E0D719700216B82 /* RxDataSources in Frameworks */,
+				8048A5E62E0D720000216B82 /* GSPlayer in Frameworks */,
+				8048A5C02E0D712800216B82 /* RxBlocking in Frameworks */,
+				8048A5CA2E0D712800216B82 /* RxRelay in Frameworks */,
+				8048A5C52E0D712800216B82 /* RxCocoa in Frameworks */,
+				8048A5DD2E0D719000216B82 /* RxDataSources in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -94,11 +125,10 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 80472F212E0188420098B744 /* Build configuration list for PBXNativeTarget "AI-Generator" */;
 			buildPhases = (
-				17531A5719BD0A12B0F92003 /* [CP] Check Pods Manifest.lock */,
 				80472F0A2E0188410098B744 /* Sources */,
 				80472F0B2E0188410098B744 /* Frameworks */,
 				80472F0C2E0188410098B744 /* Resources */,
-				2B8E6E63E89006B5D5BD51E3 /* [CP] Embed Pods Frameworks */,
+				8048A5D82E0D712800216B82 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -138,6 +168,9 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				80694A2E2E04D7A1004D83CF /* XCRemoteSwiftPackageReference "SwiftHelper" */,
+				8048A5BE2E0D70B700216B82 /* XCRemoteSwiftPackageReference "RxSwift" */,
+				8048A5D92E0D719000216B82 /* XCRemoteSwiftPackageReference "RxDataSources" */,
+				8048A5E22E0D71F800216B82 /* XCRemoteSwiftPackageReference "GSPlayer" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 80472F0F2E0188410098B744 /* Products */;
@@ -159,48 +192,6 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
-/* Begin PBXShellScriptBuildPhase section */
-		17531A5719BD0A12B0F92003 /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-AI-Generator-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		2B8E6E63E89006B5D5BD51E3 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-AI-Generator/Pods-AI-Generator-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-AI-Generator/Pods-AI-Generator-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-AI-Generator/Pods-AI-Generator-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-/* End PBXShellScriptBuildPhase section */
-
 /* Begin PBXSourcesBuildPhase section */
 		80472F0A2E0188410098B744 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -214,7 +205,6 @@
 /* Begin XCBuildConfiguration section */
 		80472F222E0188420098B744 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = AAD76DD66F9C8800CFCFF106 /* Pods-AI-Generator.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -243,7 +233,6 @@
 		};
 		80472F232E0188420098B744 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 3F8FAF8604A91C99E9464A8A /* Pods-AI-Generator.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -413,6 +402,30 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		8048A5BE2E0D70B700216B82 /* XCRemoteSwiftPackageReference "RxSwift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ReactiveX/RxSwift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 6.9.0;
+			};
+		};
+		8048A5D92E0D719000216B82 /* XCRemoteSwiftPackageReference "RxDataSources" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/RxSwiftCommunity/RxDataSources.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.0.2;
+			};
+		};
+		8048A5E22E0D71F800216B82 /* XCRemoteSwiftPackageReference "GSPlayer" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/wxxsw/GSPlayer.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.2.29;
+			};
+		};
 		80694A2E2E04D7A1004D83CF /* XCRemoteSwiftPackageReference "SwiftHelper" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Vladimir089/SwiftHelper.git";
@@ -424,6 +437,56 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		8048A5BF2E0D712800216B82 /* RxBlocking */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8048A5BE2E0D70B700216B82 /* XCRemoteSwiftPackageReference "RxSwift" */;
+			productName = RxBlocking;
+		};
+		8048A5C42E0D712800216B82 /* RxCocoa */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8048A5BE2E0D70B700216B82 /* XCRemoteSwiftPackageReference "RxSwift" */;
+			productName = RxCocoa;
+		};
+		8048A5C92E0D712800216B82 /* RxRelay */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8048A5BE2E0D70B700216B82 /* XCRemoteSwiftPackageReference "RxSwift" */;
+			productName = RxRelay;
+		};
+		8048A5CE2E0D712800216B82 /* RxSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8048A5BE2E0D70B700216B82 /* XCRemoteSwiftPackageReference "RxSwift" */;
+			productName = RxSwift;
+		};
+		8048A5DA2E0D719000216B82 /* Differentiator */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8048A5D92E0D719000216B82 /* XCRemoteSwiftPackageReference "RxDataSources" */;
+			productName = Differentiator;
+		};
+		8048A5DC2E0D719000216B82 /* RxDataSources */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8048A5D92E0D719000216B82 /* XCRemoteSwiftPackageReference "RxDataSources" */;
+			productName = RxDataSources;
+		};
+		8048A5DE2E0D719700216B82 /* Differentiator */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8048A5D92E0D719000216B82 /* XCRemoteSwiftPackageReference "RxDataSources" */;
+			productName = Differentiator;
+		};
+		8048A5E02E0D719700216B82 /* RxDataSources */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8048A5D92E0D719000216B82 /* XCRemoteSwiftPackageReference "RxDataSources" */;
+			productName = RxDataSources;
+		};
+		8048A5E32E0D71F800216B82 /* GSPlayer */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8048A5E22E0D71F800216B82 /* XCRemoteSwiftPackageReference "GSPlayer" */;
+			productName = GSPlayer;
+		};
+		8048A5E52E0D720000216B82 /* GSPlayer */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8048A5E22E0D71F800216B82 /* XCRemoteSwiftPackageReference "GSPlayer" */;
+			productName = GSPlayer;
+		};
 		80694A2F2E04D7A1004D83CF /* SwiftHelper */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 80694A2E2E04D7A1004D83CF /* XCRemoteSwiftPackageReference "SwiftHelper" */;

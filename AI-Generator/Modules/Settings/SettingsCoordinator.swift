@@ -46,6 +46,13 @@ class SettingsCoordinator: BaseCoordinator {
                 self.navigationController.present(safaryVC, animated: true)
             })
             .disposed(by: disposeBag)
+        
+        viewModelInput.shouldShowLoading
+            .drive(onNext: { [weak viewController] isLoadNeeded in
+                guard let viewController = viewController else { return }
+                self.setActivityLoading(from: viewController, isShowen: isLoadNeeded)
+            })
+            .disposed(by: disposeBag)
     }
     
     override func finish() {}

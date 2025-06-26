@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import UIKit
 import RxSwift
 import RxCocoa
 import AVFoundation
@@ -25,12 +26,12 @@ protocol ProfileViewModelToView {
     var output: ProfileViewModelOutputs { get }
 }
 
-protocol ProfileViewModelToCoordinator {
+protocol ProfileViewModelToCoordinator: ViewModelToCoordinator {
     var shouldOpenSettings: Driver<Void> { get }
     var shouldOpenVideo: Driver<URL> { get }
 }
 
-class ProfileViewModel: ViewModelConfigurable, ProfileViewModelInputs, ProfileViewModelOutputs, ProfileViewModelToView, ProfileViewModelToCoordinator {
+class ProfileViewModel: BaseViewModel, ProfileViewModelInputs, ProfileViewModelOutputs, ProfileViewModelToView, ProfileViewModelToCoordinator {
     private let apiService: PixVerseAPIServiceProtocol
     private let storageService: UserDefaultsServiceProtocol
     private let disposeBag = DisposeBag()
@@ -64,11 +65,10 @@ class ProfileViewModel: ViewModelConfigurable, ProfileViewModelInputs, ProfileVi
     init(apiService: PixVerseAPIServiceProtocol, storageService: UserDefaultsServiceProtocol) {
         self.apiService = apiService
         self.storageService = storageService
-        
-        setupBindings()
+        super.init()
     }
     
-    func setupBindings() {
+    override func setupBindings() {
         loadTrigger
             .subscribe(onNext: {
                 self.loadGeneratedVideos()
@@ -86,6 +86,8 @@ class ProfileViewModel: ViewModelConfigurable, ProfileViewModelInputs, ProfileVi
     }
     
     func loadGeneratedVideos() {
+        _shouldShowLoading.accept(true)
+        
         let generatedVideos = storageService.getAllGeneratedVideos()
         let thumbnailSingles: [Single<GeneratedVideoCellModel>] = generatedVideos
             .compactMap { video -> Single<GeneratedVideoCellModel>? in
@@ -97,6 +99,7 @@ class ProfileViewModel: ViewModelConfigurable, ProfileViewModelInputs, ProfileVi
         Single.zip(thumbnailSingles)
             .subscribe(onSuccess: { [weak self] elements in
                 self?._sectionedVideos.onNext([SectionOfVideos(items: elements)])
+                self?._shouldShowLoading.accept(false)
             }, onFailure: { error in
                 print(error)
             })

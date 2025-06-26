@@ -7,6 +7,7 @@
 
 import Foundation
 import RxSwift
+import UIKit
 
 class VideoResultCoordinator: BaseCoordinator {
     private let videoURL: URL

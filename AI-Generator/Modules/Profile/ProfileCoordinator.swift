@@ -8,6 +8,7 @@
 import Foundation
 import RxSwift
 import RxCocoa
+import UIKit
 
 class ProfileCoordinator: BaseCoordinator {
 //    private let disposeBag = DisposeBag()
@@ -47,6 +48,12 @@ class ProfileCoordinator: BaseCoordinator {
             .drive { url in
                 self.goToVideo(videoURL: url)
             }
+            .disposed(by: disposeBag)
+        
+        viewModelInput.shouldShowLoading
+            .drive(onNext: { isLoadNeeded in
+                self.setActivityLoading(from: viewController, isShowen: isLoadNeeded)
+            })
             .disposed(by: disposeBag)
     }
     

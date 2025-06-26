@@ -28,6 +28,21 @@ class BaseCoordinator {
         navigationController.present(alertController, animated: true)
     }
     
+    func setActivityLoading(from vc: UIViewController, isShowen: Bool) {
+        if let sheet = vc.sheetPresentationController {
+            sheet.detents = [.medium()]
+            sheet.preferredCornerRadius = 20
+        }
+        
+        if isShowen {
+            let activityViewController = LoadingActivityViewController()
+            activityViewController.modalTransitionStyle = .crossDissolve
+            vc.present(activityViewController, animated: true)
+        } else {
+            vc.dismiss(animated: true)
+        }
+    }
+    
     func childDidFinished(child: BaseCoordinator) {
         if let index = childCoordinators.firstIndex(where: { $0 === child }) {
             childCoordinators.remove(at: index)

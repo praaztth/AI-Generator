@@ -25,9 +25,10 @@ protocol SettingsViewModelToView {
     var output: SettingsViewModelOutputs { get }
 }
 
-protocol SettingsViewModelToCoordinator {
+protocol SettingsViewModelToCoordinator: ViewModelToCoordinator {
     var shouldOpenPaywall: Observable<Void> { get }
     var shouldOpenLink: Driver<URL> { get }
+//    var shouldShowLoading: Driver<Bool> { get }
 }
 
 enum SettingItems: String, CaseIterable {
@@ -39,7 +40,7 @@ enum SettingItems: String, CaseIterable {
     case support = "Support"
 }
 
-class SettingsViewModel: ViewModelConfigurable, SettingsViewModelInputs, SettingsViewModelOutputs, SettingsViewModelToView, SettingsViewModelToCoordinator {
+class SettingsViewModel: BaseViewModel, SettingsViewModelInputs, SettingsViewModelOutputs, SettingsViewModelToView, SettingsViewModelToCoordinator {
     private let storageService: UserDefaultsServiceProtocol
     private let disposeBag = DisposeBag()
     
@@ -64,13 +65,17 @@ class SettingsViewModel: ViewModelConfigurable, SettingsViewModelInputs, Setting
         _shouldOpenLink.asDriver(onErrorJustReturn: URL(string: "https://example.com")!)
     }
     
+//    private let _shouldShowLoading = PublishRelay<Bool>()
+//    var shouldShowLoading: Driver<Bool> {
+//        _shouldShowLoading.asDriver(onErrorJustReturn: false)
+//    }
+    
     init(storageService: UserDefaultsServiceProtocol) {
         self.storageService = storageService
-        
-        setupBindings()
+        super.init()
     }
     
-    func setupBindings() {
+    override func setupBindings() {
         didTapOpenPaywall
             .bind(to: _shouldOpenPaywall)
             .disposed(by: disposeBag)
@@ -104,7 +109,9 @@ class SettingsViewModel: ViewModelConfigurable, SettingsViewModelInputs, Setting
     }
     
     func openLinkToMail() {
-        DispatchQueue.main.async {
+        _shouldShowLoading.accept(true)
+        
+        DispatchQueue.main.async { [weak self] in
             let mailTo = "nikolaaabaaabic@outlook.com"
             let stringURL = "mailto:\(mailTo)"
             let userID = Apphud.userID()
@@ -122,15 +129,21 @@ class SettingsViewModel: ViewModelConfigurable, SettingsViewModelInputs, Setting
             } else {
                 print("Mail app not available")
             }
+            
+            self?._shouldShowLoading.accept(false)
         }
     }
     
     func requestReview() {
-        DispatchQueue.main.async {
+        _shouldShowLoading.accept(true)
+        
+        DispatchQueue.main.async { [weak self] in
             guard let scene = UIApplication.shared.connectedScenes.first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene else {
                 return
             }
             AppStore.requestReview(in: scene)
+            
+            self?._shouldShowLoading.accept(false)
         }
     }
 }

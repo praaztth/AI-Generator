@@ -8,6 +8,7 @@
 import Foundation
 import RxSwift
 import RxCocoa
+import UIKit
 
 class UsePromptCoordinator: BaseCoordinator {
 //    private let disposeBag = DisposeBag()

@@ -7,6 +7,7 @@
 
 import Foundation
 import RxSwift
+import UIKit
 
 class TabBarCoordinator: BaseCoordinator {
 //    var childCoordinators = [CoordinatorProtocol]()

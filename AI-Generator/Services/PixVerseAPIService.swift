@@ -5,6 +5,7 @@
 //  Created by катенька on 20.06.2025.
 //
 
+import Foundation
 import RxSwift
 
 protocol PixVerseAPIServiceProtocol {
