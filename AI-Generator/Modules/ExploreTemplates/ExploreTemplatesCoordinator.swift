@@ -9,13 +9,13 @@ import UIKit
 import RxSwift
 import RxCocoa
 
-final class ExploreTemplatesCoordinator: CoordinatorProtocol {
-    var childCoordinators: [CoordinatorProtocol] = []
-    var navigationController = UINavigationController()
+final class ExploreTemplatesCoordinator: BaseCoordinator {
+//    var childCoordinators: [CoordinatorProtocol] = []
+//    var navigationController = UINavigationController()
     let apiService: PixVerseAPIServiceProtocol
     let storageService: UserDefaultsServiceProtocol
-    var didFinish = PublishSubject<Void>()
-    let disposeBag = DisposeBag()
+//    var didFinish = PublishSubject<Void>()
+//    let disposeBag = DisposeBag()
     
     private let _openPaywallEvent = PublishRelay<Void>()
     var openPaywallEvent: Driver<Void> {
@@ -23,12 +23,13 @@ final class ExploreTemplatesCoordinator: CoordinatorProtocol {
     }
     
     
-    init(apiService: PixVerseAPIServiceProtocol, storageService: UserDefaultsServiceProtocol) {
+    init(apiService: PixVerseAPIServiceProtocol, storageService: UserDefaultsServiceProtocol, navigationController: UINavigationController) {
         self.apiService = apiService
         self.storageService = storageService
+        super.init(navigationController: navigationController)
     }
     
-    func start() {
+    override func start() {
         let viewModel = ExploreTemplatesViewModel(apiService: apiService, templatesCache: CacheService.shared)
         let viewController = ExploreTemplatesViewController(viewModel: viewModel)
         navigationController.viewControllers = [viewController]
@@ -42,9 +43,7 @@ final class ExploreTemplatesCoordinator: CoordinatorProtocol {
             .disposed(by: disposeBag)
     }
     
-    func finish() {
-        
-    }
+    override func finish() {}
     
     func goToTemplate(id: Int) {
         let coordinator = UseEffectsCoordinator(effectID: id, apiService: apiService, storageService: storageService, navigationController: navigationController)

@@ -9,19 +9,18 @@ import UIKit
 import RxSwift
 import RxCocoa
 
-// TODO: separate to two different modules
-final class UseEffectsCoordinator: CoordinatorProtocol {
-    var childCoordinators: [CoordinatorProtocol] = []
-    var navigationController: UINavigationController
+final class UseEffectsCoordinator: BaseCoordinator {
+//    var childCoordinators: [CoordinatorProtocol] = []
+//    var navigationController: UINavigationController
     private let effectID: Int
     private let apiService: PixVerseAPIServiceProtocol
     private let storageService: UserDefaultsServiceProtocol
     private var viewModel: UseEffectViewModelProtocol?
-    private let disposeBag = DisposeBag()
+//    private let disposeBag = DisposeBag()
     
     private var shouldOpenResultView = true
     
-    var didFinish = PublishSubject<Void>()
+//    var didFinish = PublishSubject<Void>()
     
     private let _shouldOpenPaywall = PublishRelay<Void>()
     var shouldOpenPaywall: Observable<Void> {
@@ -32,10 +31,12 @@ final class UseEffectsCoordinator: CoordinatorProtocol {
         self.effectID = effectID
         self.apiService = apiService
         self.storageService = storageService
-        self.navigationController = navigationController
+        super.init(navigationController: navigationController)
+
+//        self.navigationController = navigationController
     }
     
-    func start() {
+    override func start() {
         viewModel = UseEffectViewModel(effectID: self.effectID, apiService: apiService, storageSevice: storageService, cacheService: CacheService.shared)
         let viewController = UseEffectViewController(viewModel: viewModel!)
         navigationController.pushViewController(viewController, animated: true)
@@ -66,13 +67,13 @@ final class UseEffectsCoordinator: CoordinatorProtocol {
             .disposed(by: disposeBag)
     }
     
-    func showAlert(message: String) {
-        let alertController = UIAlertController(title: nil, message: message, preferredStyle: .alert)
-        alertController.addAction(UIAlertAction(title: "OK", style: .default))
-        navigationController.present(alertController, animated: true)
-    }
+//    func showAlert(message: String) {
+//        let alertController = UIAlertController(title: nil, message: message, preferredStyle: .alert)
+//        alertController.addAction(UIAlertAction(title: "OK", style: .default))
+//        navigationController.present(alertController, animated: true)
+//    }
     
-    func finish() {
+    override func finish() {
         didFinish.onNext(())
     }
     

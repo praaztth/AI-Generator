@@ -15,24 +15,25 @@ enum GenerateBy {
     case videoStyle(videoData: Data, videoName: String, templateID: String)
 }
 
-class VideoGenerationCoordinator: CoordinatorProtocol {
+class VideoGenerationCoordinator: BaseCoordinator {
     private let apiService: PixVerseAPIServiceProtocol
     private let storageService: UserDefaultsServiceProtocol
     private let generateBy: GenerateBy
-    private let disposeBag = DisposeBag()
+//    private let disposeBag = DisposeBag()
     
-    var childCoordinators: [any CoordinatorProtocol] = []
-    var navigationController: UINavigationController
-    var didFinish = PublishSubject<Void>()
+//    var childCoordinators: [any CoordinatorProtocol] = []
+//    var navigationController: UINavigationController
+//    var didFinish = PublishSubject<Void>()
     
     init(navigationController: UINavigationController, apiService: PixVerseAPIServiceProtocol, storageService: UserDefaultsServiceProtocol, generateBy: GenerateBy) {
-        self.navigationController = navigationController
+//        self.navigationController = navigationController
         self.apiService = apiService
         self.storageService = storageService
         self.generateBy = generateBy
+        super.init(navigationController: navigationController)
     }
     
-    func start() {
+    override func start() {
         let viewModel = VideoGenerationViewModel(apiService: apiService, storageService: storageService, generateBy: generateBy)
         let viewController = VideoGenerationViewController(viewModel: viewModel)
         navigationController.pushViewController(viewController, animated: true)
@@ -46,11 +47,12 @@ class VideoGenerationCoordinator: CoordinatorProtocol {
             .disposed(by: disposeBag)
         
         viewModel.generationFinished
-            .subscribe(onNext: { url in
-                self.goToResultView(videoURL: url)
-            }) { error in
+            .subscribe(onNext: { [weak self] url in
+                self?.goToResultView(videoURL: url)
+            }) { [weak self] error in
                 DispatchQueue.main.async {
-                    self.navigationController.popToRootViewController(animated: true)
+                    self?.navigationController.popToRootViewController(animated: true)
+                    self?.showAlert(message: error.localizedDescription)
                 }
             }
             .disposed(by: disposeBag)
@@ -66,7 +68,5 @@ class VideoGenerationCoordinator: CoordinatorProtocol {
         }).disposed(by: disposeBag)
     }
     
-    func finish() {
-        
-    }
+    override func finish() {}
 }

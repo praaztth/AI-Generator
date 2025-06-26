@@ -9,17 +9,17 @@ import UIKit
 import RxSwift
 import RxCocoa
 
-class PaywallCoordinator: CoordinatorProtocol {
-    var childCoordinators: [CoordinatorProtocol] = []
-    let navigationController: UINavigationController
-    var didFinish = PublishSubject<Void>()
+class PaywallCoordinator: BaseCoordinator {
+//    var childCoordinators: [CoordinatorProtocol] = []
+//    let navigationController: UINavigationController
+//    var didFinish = PublishSubject<Void>()
     let disposedBag = DisposeBag()
     
-    init(navigationController: UINavigationController) {
-        self.navigationController = navigationController
-    }
+//    init(navigationController: UINavigationController) {
+//        self.navigationController = navigationController
+//    }
     
-    func start() {
+    override func start() {
         let viewModel = PaywallViewModel()
         let viewController = PaywallViewController(viewModel: viewModel)
         navigationController.modalPresentationStyle = .fullScreen
@@ -43,13 +43,13 @@ class PaywallCoordinator: CoordinatorProtocol {
             .disposed(by: disposedBag)
     }
     
-    func showAlert(message: String) {
-        let alertController = UIAlertController(title: nil, message: message, preferredStyle: .alert)
-        alertController.addAction(UIAlertAction(title: "OK", style: .default))
-        navigationController.present(alertController, animated: true)
-    }
+//    func showAlert(message: String) {
+//        let alertController = UIAlertController(title: nil, message: message, preferredStyle: .alert)
+//        alertController.addAction(UIAlertAction(title: "OK", style: .default))
+//        navigationController.present(alertController, animated: true)
+//    }
     
-    func finish() {
+    override func finish() {
         didFinish.onNext(())
     }
 }

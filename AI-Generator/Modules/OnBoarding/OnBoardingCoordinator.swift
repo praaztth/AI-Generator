@@ -10,12 +10,12 @@ import RxSwift
 import RxCocoa
 import StoreKit
 
-class OnBoardingCoordinator: CoordinatorProtocol {
-    var childCoordinators: [CoordinatorProtocol] = []
-    var navigationController = UINavigationController()
+class OnBoardingCoordinator: BaseCoordinator {
+//    var childCoordinators: [CoordinatorProtocol] = []
+//    var navigationController = UINavigationController()
     let currentPageIndex = BehaviorRelay(value: 0)
-    var didFinish = PublishSubject<Void>()
-    let disposeBag = DisposeBag()
+//    var didFinish = PublishSubject<Void>()
+//    let disposeBag = DisposeBag()
     
     let pages: [OnBoardingPageModel] = [
         OnBoardingPageModel(title: "AI Power", description: "Unleash the power of imagination - turn moments into art with AI", imageName: "onboarding1"),
@@ -23,7 +23,7 @@ class OnBoardingCoordinator: CoordinatorProtocol {
         OnBoardingPageModel(title: "AI Templates", description: "Turn any photo into a social media hit with our library of vibrant video template", imageName: "onboarding3")
     ]
     
-    func start() {
+    override func start() {
         currentPageIndex.subscribe(onNext: { index in
             let page = self.pages[index]
             
@@ -39,7 +39,7 @@ class OnBoardingCoordinator: CoordinatorProtocol {
         }).disposed(by: disposeBag)
     }
     
-    func finish() {
+    override func finish() {
         didFinish.onNext(())
     }
     

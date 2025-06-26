@@ -8,27 +8,28 @@
 import Foundation
 import RxSwift
 
-class TabBarCoordinator: CoordinatorProtocol {
-    var childCoordinators = [CoordinatorProtocol]()
-    var didFinish = PublishSubject<Void>()
+class TabBarCoordinator: BaseCoordinator {
+//    var childCoordinators = [CoordinatorProtocol]()
+//    var didFinish = PublishSubject<Void>()
     
     let tabBarController = UITabBarController()
-    private let disposeBag = DisposeBag()
+//    private let disposeBag = DisposeBag()
     
     let apiService: PixVerseAPIServiceProtocol
     var storageService: UserDefaultsServiceProtocol
     
-    init(apiService: PixVerseAPIServiceProtocol, storageService: UserDefaultsServiceProtocol) {
+    init(apiService: PixVerseAPIServiceProtocol, storageService: UserDefaultsServiceProtocol, navigationController: UINavigationController) {
         self.apiService = apiService
         self.storageService = storageService
+        super.init(navigationController: navigationController)
     }
     
-    func start() {
+    override func start() {
         configureTabBarController()
         
-        let templatesExploreCoordinator = ExploreTemplatesCoordinator(apiService: apiService, storageService: storageService)
-        let stylesExploreCoordinator = ExploreStyleCoordinator(apiService: apiService, storageService: storageService)
-        let usePromptCoordinator = UsePromptCoordinator(apiService: apiService, storageService: storageService)
+        let templatesExploreCoordinator = ExploreTemplatesCoordinator(apiService: apiService, storageService: storageService, navigationController: UINavigationController())
+        let stylesExploreCoordinator = ExploreStyleCoordinator(apiService: apiService, storageService: storageService, navigationController: UINavigationController())
+        let usePromptCoordinator = UsePromptCoordinator(apiService: apiService, storageService: storageService, navigationController: UINavigationController())
         let profileCoordinator = ProfileCoordinator(apiService: apiService, storageService: storageService, navigationController: UINavigationController())
         
         templatesExploreCoordinator.start()
@@ -74,6 +75,7 @@ class TabBarCoordinator: CoordinatorProtocol {
             .disposed(by: disposeBag)
     }
     
+    // TODO: move to BaseController and call from each modules separeted
     func showPayWall() {
         let navigationController = UINavigationController()
         let coordinator = PaywallCoordinator(navigationController: navigationController)
@@ -88,9 +90,7 @@ class TabBarCoordinator: CoordinatorProtocol {
         }).disposed(by: disposeBag)
     }
     
-    func finish() {
-        
-    }
+    override func finish() {}
     
     private func configureTabBarController() {
         let appearance = UITabBarAppearance()

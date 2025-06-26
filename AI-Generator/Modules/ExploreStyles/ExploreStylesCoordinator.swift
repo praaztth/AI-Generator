@@ -9,11 +9,11 @@ import Foundation
 import RxSwift
 import RxCocoa
 
-class ExploreStyleCoordinator: CoordinatorProtocol {
-    private let disposeBag = DisposeBag()
+class ExploreStyleCoordinator: BaseCoordinator {
+//    private let disposeBag = DisposeBag()
     
-    var childCoordinators = [CoordinatorProtocol]()
-    var didFinish = PublishSubject<Void>()
+//    var childCoordinators = [CoordinatorProtocol]()
+//    var didFinish = PublishSubject<Void>()
     
     private let _shouldOpenPaywall = PublishRelay<Void>()
     var shouldOpenPaywall: Driver<Void> {
@@ -22,14 +22,15 @@ class ExploreStyleCoordinator: CoordinatorProtocol {
     
     let apiService: PixVerseAPIServiceProtocol
     let storageService: UserDefaultsServiceProtocol
-    var navigationController = UINavigationController()
+//    var navigationController = UINavigationController()
     
-    init(apiService: PixVerseAPIServiceProtocol, storageService: UserDefaultsServiceProtocol) {
+    init(apiService: PixVerseAPIServiceProtocol, storageService: UserDefaultsServiceProtocol, navigationController: UINavigationController) {
         self.apiService = apiService
         self.storageService = storageService
+        super.init(navigationController: navigationController)
     }
     
-    func start() {
+    override func start() {
         let viewModel = ExploreStylesViewModel(apiService: apiService, storageService: storageService, cacheService: CacheService.shared)
         let viewController = ExploreStylesViewController(viewModel: viewModel)
         navigationController.viewControllers = [viewController]
@@ -62,7 +63,5 @@ class ExploreStyleCoordinator: CoordinatorProtocol {
             .disposed(by: disposeBag)
     }
     
-    func finish() {
-        
-    }
+    override func finish() {}
 }

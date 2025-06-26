@@ -17,10 +17,21 @@ protocol PixVerseAPIServiceProtocol {
     func observeVideoGenerationStatus(videoID: String) -> Observable<(String, GeneratedVideo)>
 }
 
-enum PixVerseAPIError: Error {
+enum PixVerseAPIError: LocalizedError {
     case requestFailed(Error)
     case decodingError(String)
     case notFound
+    
+    var errorDescription: String? {
+        switch self {
+        case .requestFailed(let error):
+            NSLocalizedString(error.localizedDescription, comment: "")
+        case .decodingError(let string):
+            NSLocalizedString(string, comment: "")
+        case .notFound:
+            NSLocalizedString("Source wasn't found", comment: "")
+        }
+    }
 }
 
 enum PixVerseAPIGenerationStatus {
@@ -130,15 +141,12 @@ class PixVerseAPIService: PixVerseAPIServiceProtocol {
                     do {
                         let generatedVideo = try JSONDecoder().decode(GeneratedVideo.self, from: data)
                         observer.onNext(generatedVideo)
-                        print("checkPendingRequest(requestID: String): \(generatedVideo)")
                     } catch {
                         if let responce = try? JSONSerialization.jsonObject(with: data) as? String {
                             observer.onError(PixVerseAPIError.decodingError(responce))
-                            print("checkPendingRequest(requestID: String): \(responce)")
                         } else {
                             let responce = String(data: data, encoding: .utf8) ?? "Unknown error"
                             observer.onError(PixVerseAPIError.decodingError(responce))
-                            print("checkPendingRequest(requestID: String): \(responce)")
                         }
                         
                     }
@@ -207,7 +215,7 @@ class PixVerseAPIService: PixVerseAPIServiceProtocol {
                         let jsonResponse = try? JSONSerialization.jsonObject(with: data) as? String
                         let utfResponse = String(data: data, encoding: .utf8)
                         
-                        single(.failure(PixVerseAPIError.decodingError(jsonResponse ?? utfResponse ?? "Unknown error")))
+                        single(.failure(PixVerseAPIError.decodingError(jsonResponse ?? utfResponse ?? "Unknown decoding error")))
                     }
                 case .failure(let error):
                     single(.failure(error))

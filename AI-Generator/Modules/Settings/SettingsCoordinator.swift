@@ -10,11 +10,11 @@ import RxSwift
 import RxCocoa
 import SafariServices
 
-class SettingsCoordinator: CoordinatorProtocol {
-    private let disposeBag = DisposeBag()
-    
-    var childCoordinators = [CoordinatorProtocol]()
-    var didFinish = PublishSubject<Void>()
+class SettingsCoordinator: BaseCoordinator {
+//    private let disposeBag = DisposeBag()
+//    
+//    var childCoordinators = [CoordinatorProtocol]()
+//    var didFinish = PublishSubject<Void>()
     
     private let _shouldOpenPaywall = PublishRelay<Void>()
     var shouldOpenPaywall: Observable<Void> {
@@ -22,14 +22,14 @@ class SettingsCoordinator: CoordinatorProtocol {
     }
     
     let storageService: UserDefaultsServiceProtocol
-    var navigationController: UINavigationController
+//    var navigationController: UINavigationController
     
     init(storageService: UserDefaultsServiceProtocol, navigationController: UINavigationController) {
         self.storageService = storageService
-        self.navigationController = navigationController
+        super.init(navigationController: navigationController)
     }
     
-    func start() {
+    override func start() {
         let viewModel = SettingsViewModel(storageService: storageService)
         let viewController = SettingsViewController(viewModel: viewModel)
         navigationController.pushViewController(viewController, animated: true)
@@ -48,7 +48,5 @@ class SettingsCoordinator: CoordinatorProtocol {
             .disposed(by: disposeBag)
     }
     
-    func finish() {
-        
-    }
+    override func finish() {}
 }

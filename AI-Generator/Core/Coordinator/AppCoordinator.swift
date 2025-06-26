@@ -11,23 +11,24 @@ import RxSwift
 import SwiftHelper
 import ApphudSDK
 
-final class AppCoordinator: CoordinatorProtocol {
+final class AppCoordinator: BaseCoordinator {
     let window: UIWindow
     
-    var childCoordinators: [CoordinatorProtocol] = []
+//    var childCoordinators: [CoordinatorProtocol] = []
     let apiService: PixVerseAPIServiceProtocol
     var storageService: UserDefaultsServiceProtocol
     
-    var didFinish = PublishSubject<Void>()
-    let disposeBag = DisposeBag()
+//    var didFinish = PublishSubject<Void>()
+//    let disposeBag = DisposeBag()
     
     init(apiService: PixVerseAPIServiceProtocol, storageService: UserDefaultsServiceProtocol, window: UIWindow) {
         self.apiService = apiService
         self.storageService = storageService
         self.window = window
+        super.init(navigationController: UINavigationController())
     }
     
-    func start() {
+    override func start() {
 //        Apphud.enableDebugLogs()
         DispatchQueue.main.async {
             Apphud.start(apiKey: "app_NRNkc8FMVUrccB1iUNjzNQAA3rZaAQ")
@@ -43,10 +44,10 @@ final class AppCoordinator: CoordinatorProtocol {
         checkPendingRequests()
     }
     
-    func finish() {}
+    override func finish() {}
     
     func goToOnBoarding() {
-        let coordinator = OnBoardingCoordinator()
+        let coordinator = OnBoardingCoordinator(navigationController: UINavigationController())
         coordinator.start()
         childCoordinators.append(coordinator)
         
@@ -62,7 +63,7 @@ final class AppCoordinator: CoordinatorProtocol {
     }
     
     func goToTabBar(showPaywall: Bool = false) {
-        let coordinator = TabBarCoordinator(apiService: apiService, storageService: storageService)
+        let coordinator = TabBarCoordinator(apiService: apiService, storageService: storageService, navigationController: UINavigationController())
         coordinator.start()
         
         childCoordinators.append(coordinator)
