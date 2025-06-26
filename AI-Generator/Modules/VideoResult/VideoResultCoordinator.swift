@@ -12,16 +12,9 @@ import UIKit
 class VideoResultCoordinator: BaseCoordinator {
     private let videoURL: URL
     private let storageService: UserDefaultsServiceProtocol
-//    private let disposeBag = DisposeBag()
-    
-//    var childCoordinators: [CoordinatorProtocol] = []
-//    var navigationController: UINavigationController
-//    var didFinish = PublishSubject<Void>()
     
     init(videoURL: URL, navigationController: UINavigationController, storageService: UserDefaultsServiceProtocol) {
-        
         self.videoURL = videoURL
-//        self.navigationController = navigationController
         self.storageService = storageService
         super.init(navigationController: navigationController)
     }
@@ -36,6 +29,12 @@ class VideoResultCoordinator: BaseCoordinator {
                 if value {
                     self.navigationController.popToRootViewController(animated: true)
                 }
+            })
+            .disposed(by: disposeBag)
+        
+        viewModel.shouldShowLoading
+            .drive(onNext: { isLoadNeeded in
+                self.setActivityLoading(from: viewController, isShowen: isLoadNeeded)
             })
             .disposed(by: disposeBag)
     }
